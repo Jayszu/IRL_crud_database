@@ -20,8 +20,8 @@ const App = () => {
   }, [currentPage, currentDatabase, searchQuery]); // Fetch data whenever currentPage, currentDatabase, or searchQuery changes
 
   const fetchData = async () => {
-    const base = new Airtable({ apiKey: 'pato2uM4jlfP6sYN2.f7f7d5f628bd62cc66d9d5e91faf58f4f2e161fe72027e4ba343bcd3b74a40bb' })
-      .base('appECQ2IWk4q6BHSj');
+    const base = new Airtable({ apiKey: '' })
+      .base('');
 
     const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
