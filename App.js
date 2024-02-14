@@ -3,7 +3,8 @@ import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity } from 'reac
 import Airtable from 'airtable';
 import Header from './Components/Header';
 import SearchBar from './Components/SearchBar';
-import Pagination from 'react-native-pagination'; // Import the pagination component
+import { Popup } from 'react-native-windows';
+import EditTable from './Components/EditTable';
 
 const ITEMS_PER_PAGE = 15; // Number of items to fetch per page
 
@@ -14,6 +15,8 @@ const App = () => {
   const [currentDatabase, setCurrentDatabase] = useState('IRL_Lab_Supplies'); // Default database
   const [previousDatabase, setPreviousDatabase] = useState(''); // Previous database
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null); // Selected item data
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -106,10 +109,55 @@ const App = () => {
     setCurrentPage(1); // Reset to the first page when performing a new search
   };
 
+  const handleEditItem = (item) => {
+    setSelectedItem(item);
+    setEditModalVisible(true);
+  };
+
+  const handleItemChange = (text) => {
+    setSelectedItem(prevItem => ({ ...prevItem, Item: text }));
+  };
+
+  const handleLocationChange = (text) => {
+    setSelectedItem(prevItem => ({ ...prevItem, Location: text }));
+  };
+
+  const handleDescriptionChange = (text) => {
+    setSelectedItem(prevItem => ({ ...prevItem, Description: text }));
+  };
+
+  const handleTotalQtyChange = (text) => {
+    setSelectedItem(prevItem => ({ ...prevItem, TotalQty: text }));
+  };
+
+  const handleBrandChange = (text) => {
+    setSelectedItem(prevItem => ({ ...prevItem, Brand: text }));
+  };
+
+  const handlePackingChange = (text) => {
+    setSelectedItem(prevItem => ({ ...prevItem, Packing: text }));
+  };
+
+  const handleDateRChange = (text) => {
+    setSelectedItem(prevItem => ({ ...prevItem, DateReceived: text }));
+  };
+
+  const handleExpDChange = (text) => {
+    setSelectedItem(prevItem => ({ ...prevItem, ExpirationDate: text }));
+  };
+
+  const handleUpdate = () => {
+    // Update item in your data source (e.g., Airtable)
+    // Close the edit modal
+    setEditModalVisible(false);
+    // Refresh data after update
+    fetchData();
+  };
+
   const renderHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.headerOptions}>
-        <View style={styles.SearchBar} >
+        <View style={styles.SearchBar}>
           <SearchBar onSearch={handleSearch} />
         </View>
         <TouchableOpacity
@@ -155,6 +203,8 @@ const App = () => {
             <Text style={[styles.Hcell, styles.headerText]}>{item.Packing}</Text>
             <Text style={[styles.Hcell, styles.headerText]}>{item.DateReceived}</Text>
             <Text style={[styles.Hcell, styles.headerText]}>{item.ExpirationDate}</Text>
+            <View style={styles.blankcell}>
+            </View>
           </View>
         </View>
       );
@@ -179,6 +229,12 @@ const App = () => {
         <Text style={styles.cell}>{item.Packing}</Text>
         <Text style={styles.cell}>{item.DateReceived}</Text>
         <Text style={styles.cell}>{item.ExpirationDate}</Text>
+        <View style={styles.editCell}>
+          <TouchableOpacity onPress={() => handleEditItem(item)} style={styles.editIcon}>
+            {/* Replace 'Edit' with your actual edit icon */}
+            <Text style={{color:'white',fontWeight:'700'}}>Edit</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -199,6 +255,21 @@ const App = () => {
           </View>
         }
       />
+      <EditTable
+        isOpen={editModalVisible}
+        onClose={() => setEditModalVisible(false)}
+        selectedItem={selectedItem}
+        handleItemChange={handleItemChange}
+        handleLocationChange={handleLocationChange}
+        handleDescriptionChange={handleDescriptionChange}
+        handleTotalQtyChange={handleTotalQtyChange}
+        handleBrandChange={handleBrandChange}
+        handlePackingChange={handlePackingChange}
+        handleDateRChange={handleDateRChange}
+        handleExpDChange={handleExpDChange}
+        handleUpdate={handleUpdate}
+        currentDatabase={currentDatabase}
+      />
     </View>
   );
 };
@@ -206,17 +277,18 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#97DBD3',
+    backgroundColor: '#439176',
     alignItems: 'stretch',
     justifyContent: 'flex-start',
     paddingHorizontal: 10,
     paddingTop: 10,
   },
-  itemContainer:{
-    borderWidth: 2, 
+  itemContainer: {
+    borderWidth: 2,
     borderColor: '#000000',
-    marginBottom: 5, 
-    backgroundColor:"black",
+    marginBottom: 5,
+    backgroundColor: "black",
+    position:'relative'
   },
   header: {
     flexDirection: 'row',
@@ -238,17 +310,17 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#CCCCCC',
     paddingVertical: 10,
-    width:'90%',
-    marginLeft:70,
-    position:'relative'
+    width: '90%',
+    marginLeft: 70,
+    position: 'relative'
   },
   cell: {
     flex: 1,
     textAlign: 'center',
     color: "black",
-    borderWidth: 1, 
-    borderColor: '#CCCCCC', 
-    backgroundColor:'white',
+    borderWidth: 1,
+    borderColor: '#CCCCCC',
+    backgroundColor: 'white',
   },
   paginationContainer: {
     flexDirection: 'row',
@@ -263,7 +335,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height:50,
+    height: 50,
     marginBottom: 30,
   },
   headerOptions: {
@@ -295,17 +367,31 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     color: '#F2ECEC',
-    
   },
-  SearchBar:{
-    left:1200,
-    width:200,
-    height:60
+  SearchBar: {
+    left: 1200,
+    width: 200,
+    height: 60
   },
-  noItemText:{
-    fontSize:100,
-
-  }
+  noItemText: {
+    fontSize: 100,
+  },
+  editIcon: {
+    padding: 5,
+    backgroundColor: '#E8AC13',
+    borderRadius: 3,
+  },
+  editCell: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+   
+  },
+  blankcell: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
 });
 
 export default App;
