@@ -66,7 +66,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
       }
          //refresg
          handleRefresh();
-    
+          closeState();
          // Close the popup
          onClose();
     } catch (error) {
