@@ -7,11 +7,11 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="82745b4e-9c89-4856-8b8d-de09d0f7197b"
+    Name="4b15ad79-3577-4769-a593-ce03e7f55f5e"
     Publisher="CN=btanyag"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="82745b4e-9c89-4856-8b8d-de09d0f7197b" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="4b15ad79-3577-4769-a593-ce03e7f55f5e" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>CRUD_db</DisplayName>
