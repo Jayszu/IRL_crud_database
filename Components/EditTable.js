@@ -133,8 +133,8 @@
               <TextInput
               maxLength={6}
               style={styles.input}
-              value={selectedItem.TotalQty}
-              onChangeText={(text) => handleTotalQtyChange(text)}
+              value={selectedItem.TotalQty.toString()}
+              onChangeText={(text) => handleTotalQtyChange(parseInt(text, 10))}
               placeholder="Total Quantity..."
               />
             </View>

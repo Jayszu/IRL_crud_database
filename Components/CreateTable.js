@@ -24,11 +24,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
     setDateReceived('');
     setExpirationDate('');
   }
-  const onTextChanged = (totalQuantity) => {
-    if (!isNaN(totalQuantity)) {
-      setTotalQuantity(totalQuantity);
-    }
-  };
+
   const handleCreateRecord = async () => {
     try {
       const fields = {
@@ -115,11 +111,16 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <View style={styles.fieldContainer}>
               <Text style={styles.Desc}>Total Quantity</Text>
               <TextInput
-              maxLength={6}
+                maxLength={6}
                 style={styles.input}
-                placeholder="Total Quantity..."
+                placeholder="Total Quantity.Please Only Put numerical value(eg.1000 not 1 thousand)"
                 value={totalQuantity}
-              onChangeText={onTextChanged}
+                onChangeText={(text) => {
+                  // Remove any non-numeric characters from the input
+                  const numericValue = text.replace(/[^0-9]/g, '');
+                  // Update the state with the cleaned numeric value
+                  setTotalQuantity(parseInt(numericValue));
+                }}
               />
            
               </View>

@@ -1,26 +1,27 @@
   import React, { useEffect, useState } from 'react';
   import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity } from 'react-native';
   import Airtable from 'airtable';
-  import Header from './Components/Header';
+  import TitleHeader from './Components/TitleHeader';
   import SearchBar from './Components/SearchBar';
-  import { Popup } from 'react-native-windows';
   import EditTable from './Components/EditTable';
   import CreateTable from './Components/CreateTable';
   import Delete from './Components/Delete';
 
-  const ITEMS_PER_PAGE = 15; // Number of items to fetch per page
+  const ITEMS_PER_PAGE = 10; // Number of items to fetch per page
 
   const App = () => {
     const [data, setData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalPages, setTotalPages] = useState('');
     const [currentDatabase, setCurrentDatabase] = useState('IRL_Lab_Supplies'); // Default database
     const [previousDatabase, setPreviousDatabase] = useState(''); // Previous database
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedItem, setSelectedItem] = useState(null); // Selected item data
     const [editModalVisible, setEditModalVisible] = useState(false);
-    const [createModalVisible, setCreateModalVisibile] = useState(false);
+    const [createModalVisible, setCreateModalVisible] = useState(false);
     const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+    const [PreviousPage,setPreviousPage]= useState()
+
     useEffect(() => {
       fetchData();
     }, [currentPage, currentDatabase, searchQuery]); // Fetch data whenever currentPage, currentDatabase, or searchQuery changes
@@ -28,38 +29,31 @@
     const fetchData = async () => {
       const base = new Airtable({ apiKey: 'pato2uM4jlfP6sYN2.f7f7d5f628bd62cc66d9d5e91faf58f4f2e161fe72027e4ba343bcd3b74a40bb' })
         .base('appzQzVWNYXH8WNks');
-
-      const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
+    
       try {
-        const records = await new Promise((resolve, reject) => {
-          const fetchedRecords = [];
-          base(currentDatabase).select({
-            maxRecords: ITEMS_PER_PAGE,
-            view: 'Grid view',
-            offset: offset,
-            filterByFormula: searchQuery ? `SEARCH("${searchQuery.toLowerCase()}", LOWER({ITEM}))` : '', // Apply case-insensitive search query if provided
-          }).eachPage((pageRecords, fetchNextPage) => {
-            fetchedRecords.push(...pageRecords);
-            fetchNextPage();
-          }, (err) => {
-            if (err) reject(err);
-            else resolve(fetchedRecords);
-          });
-        });
-
+        const records = await base(currentDatabase).select({
+          view: 'Grid view',
+          filterByFormula: searchQuery ? `SEARCH("${searchQuery.toLowerCase()}", LOWER({ITEM}))` : '', 
+          
+        }).all();
+    
+        // Calculate total pages based on the total number of records
+        const totalRecordsCount = records.length;
+        setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
+      
+        
         const newData = records.map(record => ({
           Id: String(record.get('Id')),
           Item: String(record.get('Item') || ''),
           Location: String(record.get('Location') || ''),
           Description: String(record.get('Description') || ''),
-          TotalQty: String(record.get('Total Qty')),
+          TotalQty: parseInt(record.get('Total Qty')), // Parses the value to a floating-point number
           Brand: String(record.get('Brand') || ''),
           Packing: String(record.get('Packing') || ''),
           DateReceived: String(record.get('Date Received') || ''),
           ExpirationDate: String(record.get('Expiration Date') || ''),
         }));
-
+    
         // Add header as the first item in the data array
         const dataWithHeader = [
           {
@@ -74,18 +68,13 @@
           },
           ...newData,
         ];
-
+    
         setData(dataWithHeader);
-
-        // Calculate total pages based on the total number of records
-        const totalRecords = await base(currentDatabase).select({}).firstPage();
-        const totalRecordsCount = totalRecords.length;
-        setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
       } catch (err) {
         console.error(err);
       }
     };
-
+    
     const switchDatabase = (newDatabase) => {
       setPreviousDatabase(currentDatabase);
       setCurrentDatabase(newDatabase);
@@ -99,33 +88,55 @@
     const goToNextPage = () => {
       if (currentPage < totalPages) {
         setCurrentPage(currentPage + 1);
+    
       }
     };
-
+    
     const goToPreviousPage = () => {
       if (currentPage > 1) {
         setCurrentPage(currentPage - 1);
+        
       }
     };
-  
+    
 
     const handleSearch = (query) => {
       setSearchQuery(query);
-      setCurrentPage(1); // Reset to the first page when performing a new search
+      // Only reset the current page if a search query is provided
+      if (query) {
+        // Set the currentPage to its previous value if it's not already 1
+        if (currentPage !== 1) {
+          setPreviousPage((prevPage) => {
+            // Store the previous page value in a variable
+            const previousPage = prevPage;
+            // Reset the currentPage to 1
+            setCurrentPage(currentPage);
+          if ({goToPreviousPage})
+            return previousPage;
+          console.log(previousPage)
+          });
+        }
+      }
     };
+    
+    
+    
+    
 
     const handleEditItem = (item) => {
       setSelectedItem(item);
       setEditModalVisible(true);
     };
+
     const handleDeleteItem = (item) => {
       setSelectedItem(item);
       setDeleteModalVisible(true);
     };
+
     const handleopenCreate = () => {
-      setCreateModalVisibile(true);
-     
+      setCreateModalVisible(true);
     };
+
     const handleItemChange = (text) => {
       setSelectedItem(prevItem => ({ ...prevItem, Item: text }));
     };
@@ -139,8 +150,17 @@
     };
 
     const handleTotalQtyChange = (text) => {
-      setSelectedItem(prevItem => ({ ...prevItem, TotalQty: text }));
+      // Parse the input text as an integer
+      const qty = parseInt(text, 10);
+      
+      // Check if the parsed value is a valid number
+      if (!isNaN(qty)) {
+        // If the parsed value is a valid number, update the state
+        setSelectedItem(prevItem => ({ ...prevItem, TotalQty: qty }));
+      }
     };
+    
+    
 
     const handleBrandChange = (text) => {
       setSelectedItem(prevItem => ({ ...prevItem, Brand: text }));
@@ -159,19 +179,18 @@
     };
 
     const handleRefresh = () => {
-     
       setEditModalVisible(false);
-      setCreateModalVisibile(false);
+      setCreateModalVisible(false);
       setDeleteModalVisible(false);
       fetchData();
+      
     };
-    
 
     const DatabaseHeader = () => (
       <View style={styles.headerContainer}>
         <View style={styles.headerOptions}>
           <View style={styles.SearchBar}>
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage}/>
           </View>
           <TouchableOpacity
             disabled={currentDatabase === 'IRL_Inventory' || !previousDatabase}
@@ -204,25 +223,25 @@
     );
 
     const renderItem = ({ item, index }) => {
-      // Render header only for the first item in the list
+      // Check if it's the header row
       if (index === 0) {
         return (
           <View style={[styles.itemContainer]}>
             <View style={[styles.row, styles.header]}>
-              <Text style={[styles.Hcell, styles.headerText]}>{item.Item}</Text>
-              <Text style={[styles.Hcell, styles.headerText]}>{item.Location}</Text>
-              <Text style={[styles.Hcell, styles.headerText]}>{item.TotalQty}</Text>
-              <Text style={[styles.Hcell, styles.headerText]}>{item.Brand}</Text>
-              <Text style={[styles.Hcell, styles.headerText]}>{item.Packing}</Text>
-              <Text style={[styles.Hcell, styles.headerText]}>{item.DateReceived}</Text>
-              <Text style={[styles.Hcell, styles.headerText]}>{item.ExpirationDate}</Text>
-              <View style={styles.blankcell}>
-              </View>
+              {/* Render different content for header cells */}
+              <Text style={[styles.Hcell, styles.headerText]}>Item</Text>
+              <Text style={[styles.Hcell, styles.headerText]}>Location</Text>
+              <Text style={[styles.Hcell, styles.headerText]}>Quantity</Text>
+              <Text style={[styles.Hcell, styles.headerText]}>Brand</Text>
+              <Text style={[styles.Hcell, styles.headerText]}>Packing</Text>
+              <Text style={[styles.Hcell, styles.headerText]}>Date DateReceived</Text>
+              <Text style={[styles.Hcell, styles.headerText]}>Expiration Date</Text>
+              <View style={styles.blankcell}></View>
             </View>
           </View>
         );
-        }
-
+      }
+    
       // Render "No item found" text if there are no items
       if (data.length === 1) {
         return (
@@ -231,11 +250,13 @@
           </View>
         );
       }
-
+    
       // Render other items in the list
       return (
         <View style={styles.row}>
-          <Text style={styles.cell}>{item.Item}</Text>
+          <TouchableOpacity onPress={() => handleItemClick(item)} style={[styles.cell, styles.touchableCell]}>
+            <Text>{item.Item}</Text>
+          </TouchableOpacity>
           <Text style={styles.cell}>{item.Location}</Text>
           <Text style={styles.cell}>{item.TotalQty}</Text>
           <Text style={styles.cell}>{item.Brand}</Text>
@@ -244,44 +265,46 @@
           <Text style={styles.cell}>{item.ExpirationDate}</Text>
           <View style={styles.editCell}>
             <TouchableOpacity onPress={() => handleEditItem(item)} style={styles.editIcon}>
-            
               <Text style={{color:'white',fontWeight:'700'}}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleDeleteItem(item)} style={styles.deleteIcon}>
-            
               <Text style={{color:'white',fontWeight:'700'}}>Delete</Text>
             </TouchableOpacity>
           </View>
         </View>
       );
     };
+    
+    
+    
 
     return (
       <View style={styles.container}>
-        <Header />
+        <TitleHeader />
         <TouchableOpacity onPress={handleopenCreate} style={styles.newRecord}>
-              <Text style={styles.NewRText}>New Record</Text>
-            </TouchableOpacity>
-     
+          <Text style={styles.NewRText}>New Record</Text>
+        </TouchableOpacity>
         {DatabaseHeader()}
         <CreateTable 
-        currentDatabase ={currentDatabase}
-        isOpen={createModalVisible}
-        onClose={() => setCreateModalVisibile(false)} 
-        handleRefresh={handleRefresh}
-      />
-        <FlatList
-          data={data}
-          renderItem={({ item, index }) => renderItem({ item, index })}
-          keyExtractor={(item, index) => index.toString()}
-          ListFooterComponent={
-            <View style={styles.paginationContainer}>
-              <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
-              <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
-              <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
-            </View>
-          }
+          currentDatabase ={currentDatabase}
+          isOpen={createModalVisible}
+          onClose={() => setCreateModalVisible(false)} 
+          handleRefresh={handleRefresh}
+          setCurrentPage={setCurrentPage}
+          
         />
+        <FlatList
+    data={data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
+    renderItem={({ item, index }) => renderItem({ item, index })}
+    keyExtractor={(item, index) => index.toString()}
+    ListFooterComponent={
+      <View style={styles.paginationContainer}>
+        <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
+        <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
+        <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+      </View>
+    }
+  />
         <EditTable
           isOpen={editModalVisible}
           onClose={() => setEditModalVisible(false)}
@@ -298,14 +321,12 @@
           currentDatabase={currentDatabase}
         />
         <Delete
-        isOpen={deleteModalVisible}
-        onClose={() => setDeleteModalVisible(false)}
-        selectedItem={selectedItem}
-        currentDatabase={currentDatabase}
-        handleRefresh={handleRefresh}
+          isOpen={deleteModalVisible}
+          onClose={() => setDeleteModalVisible(false)}
+          selectedItem={selectedItem}
+          currentDatabase={currentDatabase}
+          handleRefresh={handleRefresh}
         />
-
-           
       </View>
     );
   };
@@ -317,7 +338,6 @@
       alignItems: 'stretch',
       justifyContent: 'flex-start',
       paddingHorizontal: 10,
-      
     },
     itemContainer: {
       borderWidth: 2,
@@ -431,7 +451,7 @@
     blankcell: {
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight:50
+      marginRight:95
     },
     newRecord:{
       backgroundColor:'#32FDFE',
@@ -441,12 +461,12 @@
       height:30,
       justifyContent:'center',
       borderRadius:5
-  },
-  NewRText:{
+    },
+    NewRText:{
       fontWeight:'bold',
       fontSize:15,
       marginLeft:2
-  }
+    }
   });
 
   export default App;

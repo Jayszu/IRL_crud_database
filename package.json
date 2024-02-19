@@ -44,5 +44,9 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "windows": {
+    "icon": "./Assets/app_icon.jpg"
   }
+  
 }
