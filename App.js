@@ -121,6 +121,12 @@
     
     
     
+    const handleBackspace = () => {
+      setSelectedItem(prevState => ({
+        ...prevState,
+        TotalQty: prevState.TotalQty.slice(0, -1) // Remove the last character
+      }));
+    };
     
 
     const handleEditItem = (item) => {
@@ -150,15 +156,20 @@
     };
 
     const handleTotalQtyChange = (text) => {
-      // Parse the input text as an integer
-      const qty = parseInt(text, 10);
-      
-      // Check if the parsed value is a valid number
-      if (!isNaN(qty)) {
-        // If the parsed value is a valid number, update the state
-        setSelectedItem(prevItem => ({ ...prevItem, TotalQty: qty }));
+      // Allow backspace or if the input is a valid number
+      if (text === '' || /^\d+$/.test(text)) {
+        const intValue = text === '' ? '' : parseInt(text); // Parse to integer
+        setSelectedItem(prevState => ({
+          ...prevState,
+          TotalQty: intValue
+        }));
       }
     };
+    const handleItemClick = (item)=>{
+      console.log(`${item.Item} is clicked`)
+    }
+    
+    
     
     
 
@@ -306,6 +317,7 @@
     }
   />
         <EditTable
+        handleBackspace={handleBackspace}
           isOpen={editModalVisible}
           onClose={() => setEditModalVisible(false)}
           selectedItem={selectedItem}

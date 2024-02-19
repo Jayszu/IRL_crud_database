@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
 import { Popup } from 'react-native-windows';
 
@@ -62,6 +62,9 @@ const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefres
     >
         <View style={styles.container}>
             <View><Text>
+              <Text>
+                WARNING
+              </Text>
             <Text style={styles.WarningText}> Are you sure you want to delete <Text style={{color:'green'}}>{selectedItem.Item}</Text>  from {currentDatabase} ?</Text>
     </Text>
             </View>
