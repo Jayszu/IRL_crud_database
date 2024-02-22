@@ -12,7 +12,7 @@ const SearchBar = ({ onSearch , setCurrentPage}) => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       onSearch(searchText);
-    }, 300); // Adjust the delay as needed
+    }, 300,); // Adjust the delay as needed
     return () => clearTimeout(timeoutId);
   }, [searchText, onSearch,setCurrentPage]);
 

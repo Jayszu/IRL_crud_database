@@ -1,3 +1,1 @@
-
-export const API_KEY = pato2uM4jlfP6sYN2.f7f7d5f628bd62cc66d9d5e91faf58f4f2e161fe72027e4ba343bcd3b74a40bb   
-table = appzQzVWNYXH8WNks
+api_key ='patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3'

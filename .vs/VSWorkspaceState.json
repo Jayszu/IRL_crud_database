@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\windows",
+    "\\windows\\CRUD_db"
   ],
+  "SelectedNode": "\\windows\\CRUD_db.sln",
   "PreviewInSolutionExplorer": false
 }
