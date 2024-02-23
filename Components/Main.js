@@ -321,6 +321,7 @@ const Main = () => {
       data={data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
       renderItem={({ item, index }) => renderItem({ item, index })}
       keyExtractor={(item, index) => index.toString()}
+      ListEmptyComponent={<Text>No data available</Text>}
       ListFooterComponent={
         <View style={styles.paginationContainer}>
           <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />

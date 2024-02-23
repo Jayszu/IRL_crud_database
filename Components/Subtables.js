@@ -32,11 +32,12 @@ const SubTables = ({ route }) => {
           'Content-Type': 'application/json'
         }
       });
-
-      const totalRecordsCount = record.length;
-      setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
+  
       if (response.ok) {
         const data = await response.json();
+        const totalRecordsCount = data.records.length;
+        setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
+        
         const formattedData = data.records.map(record => ({
           DateR: record.fields['Date of Release'],
           Packing: record.fields['Packing'],
@@ -58,8 +59,8 @@ const SubTables = ({ route }) => {
       console.error('Error fetching data:', error);
     }
   };
+  
  
-
   const handleRefresh = () => {
     setEditModalVisible(false);
     setCreateModalVisible(false);
@@ -125,8 +126,16 @@ const SubTables = ({ route }) => {
             <Text style={[styles.Hcell, styles.headerText]}>Released by</Text>
             <Text style={[styles.Hcell, styles.headerText]}>Current Balance</Text>
             <Text style={[styles.Hcell, styles.headerText]}>Date Updated</Text>
-            
+            <View style={styles.blankcell}></View>
           </View>
+        </View>
+      );
+    }
+    // Render "No item found" text if there are no items
+    if (tableData.length === 0) {
+      return (
+        <View style={[styles.row, { justifyContent: 'center', paddingVertical: 10 }]}>
+          <Text style={styles.noItemText}>No item found</Text>
         </View>
       );
     }
@@ -181,7 +190,16 @@ const SubTables = ({ route }) => {
   renderItem={({ item, index }) => renderItem({ item, index })}
   keyExtractor={(item, index) => index.toString()}
   ListEmptyComponent={<Text>No data available</Text>} // Add this to see if there's any issue with data retrieval
+  ListFooterComponent={
+    <View style={styles.paginationContainer}>
+      <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
+      <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
+      <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+    </View>
+  }
 />
+
+
 
 
 
@@ -229,13 +247,12 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 10,
   },
   paginationText: {
+    marginHorizontal: 10,
     fontSize: 16,
-    fontWeight: 'bold',
   },
   image: {
     position: 'absolute',
@@ -330,7 +347,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 5,
     alignItems:'center'
-  }
+  },
+  blankcell: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: '8%', // Use percentage for margin
+  },
 });
 
 export default SubTables;
