@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
+import { StyleSheet, Text, View, TouchableOpacity, Image, TouchableNativeFeedback } from 'react-native'
 import React from 'react'
 import { Popup } from 'react-native-windows';
+import Icon from 'react-native-vector-icons/AntDesign'
 
 const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefresh}) => {
     if (!isOpen || !selectedItem) return null;
@@ -27,7 +28,7 @@ const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefres
         if (!recordId) {
           throw new Error('Record ID not found');
         }
-        console.log(recordId);
+       
         // Perform the PATCH request with the fetched record ID
         const deleteResponse = await fetch(`https://api.airtable.com/v0/appzQzVWNYXH8WNks/${currentDatabase}/${recordId}`, {
           method: 'DELETE',
@@ -54,58 +55,51 @@ const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefres
             // Handle error (e.g., show error message to the user)
     }
 }
-  return (
-    <Popup
+return (
+  <Popup
     isOpen={isOpen}
     onDismiss={onClose}
-    verticalOffset={40} // Adjust as needed
-    >
-        <View style={styles.container}>
-            <View><Text>
-            
-            <Text style={styles.WarningText}> Are you sure you want to delete <Text style={{color:'green'}}>{selectedItem.Item}</Text>  from {currentDatabase} ?</Text>
-    </Text>
-            </View>
-            <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-            <Text style={styles.deleteButtonText}>Delete</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Text style={styles.closeButtonText}>Close</Text>
-        </TouchableOpacity>
-        </View>
+    verticalOffset={30} 
+    
+  >
+    <View style={styles.container}>
+      <View>
+      <Image style={styles.image} source={require('../Assets/warning_red.png')} />
+      <View style={styles.TextContainer}>
+      <Text style={styles.DeleteText}>
+        Delete {selectedItem.Item} from {currentDatabase} ?
+      </Text>
+      </View>
+      <View style={styles.ButtonContainer}>
+      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+        <Text style={styles.deleteButtonText}>Yes, Delete it</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={onClose}style={styles.closeButton}>
+        <Text style={styles.closeButtonText}>Cancel</Text>
+      </TouchableOpacity>
+    </View></View></View>
   </Popup>
-  )
+)
+
+
 } 
 
 export default Delete
 
 const styles = StyleSheet.create({
-    container:{
-        height: 200,
-        width: 450, // Adjust the width of the popup container
-        backgroundColor: 'rgba(199, 199, 199, 1)',
-        padding: 20,
-        borderRadius: 25,
-  
-        justifyContent:"flex-start"
-        
-        
+    container:{ 
+        height:350,
+        width: 450,// Adjust the width of the popup container
+        backgroundColor: 'rgba(176, 176, 176, 0.9)',
+        padding:10,
+        borderRadius: 15,
+     
     },
-    WarningText:{
-        fontWeight:'bold',
-        color:'#FF0909',
-        fontSize:20,
-        marginLeft:30   
-    
-    },
-    ItemText:{
-        color:'green',
-        fontWeight:'bold',
-        fontSize:20,
-        marginLeft:130,
-        position:'absolute',
-        top:25  
-    },
+   DeleteText:{
+    fontSize:20,
+    fontWeight:'bold',  
+    bottom:'65%'
+   },
     deleteButtonText: {
         color: 'white',
         fontSize: 20,
@@ -113,17 +107,15 @@ const styles = StyleSheet.create({
       },
       deleteButton: {
         backgroundColor:'red',
-      borderRadius:10,
-        top:155,
+        borderRadius:10,
         width:130,
         alignItems: 'center',
         position:'absolute',
-        left:20
+        left:1  
       },
       closeButton: {
         position: 'absolute',
-        top: 155,
-        left:300,
+        left:290,
         backgroundColor:'green',
         borderRadius:10,
         width:130,
@@ -134,4 +126,22 @@ const styles = StyleSheet.create({
           fontSize: 20,
           fontWeight: 'bold',
       },
+      image: {
+        width: 100, // Adjust the width as needed (pixels or percentage)
+        height: 100, // Adjust the height as needed (pixels or percentage)
+        alignSelf: 'center', // Center the image horizontally within its parent container
+        marginBottom: "60%", // Add some space at the bottom if needed
+        right:'1%'
+      },
+      ButtonContainer:{
+        bottom:"35%"
+      },
+      TextContainer:{
+        height:80,
+        width:"100%",
+        bottom:'50%',
+        marginTop:5
+      }
+      
+      
 })

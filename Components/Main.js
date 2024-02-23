@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, Image } from 'react-native';
 import Airtable from 'airtable';
 import TitleHeader from './TitleHeader';
 import SearchBar from './SearchBar';
@@ -173,7 +173,7 @@ const Main = () => {
     }
   };
   const handleItemClick = (selectedItem) => {
-    console.log(`${selectedItem.Item} is clicked and should now go to the subtable which contains the releasing data`);
+    
     // Navigate to the desired screen here
     navigation.navigate('Subtables', { selectedItem },);
 
@@ -209,9 +209,7 @@ const Main = () => {
   const DatabaseHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.headerOptions}>
-        <View style={styles.SearchBar}>
-          <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage}/>
-        </View>
+        
         <TouchableOpacity
           disabled={currentDatabase === 'IRL_Inventory' || !previousDatabase}
           onPress={goBackToPreviousDatabase}
@@ -238,17 +236,20 @@ const Main = () => {
             Chemicals
           </Text>
         </TouchableOpacity>
-      </View>
+        <View style={styles.SearchBarContainer}>
+          <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage} style={styles.SearchBar}/>
+        </View>
+        </View>
+  
     </View>
   );
 
-  const renderItem = ({ item, index }) => {
+   const renderItem = ({ item, index }) => {
     // Check if it's the header row
     if (index === 0) {
       return (
         <View style={[styles.itemContainer]}>
           <View style={[styles.row, styles.header]}>
-            {/* Render different content for header cells */}
             <Text style={[styles.Hcell, styles.headerText]}>Item</Text>
             <Text style={[styles.Hcell, styles.headerText]}>Location</Text>
             <Text style={[styles.Hcell, styles.headerText]}>Quantity</Text>
@@ -301,7 +302,10 @@ const Main = () => {
 
   return (
     <View style={styles.container}>
-      <TitleHeader />
+      <Image
+        source={require('../Assets/logo.png')} // Specify the local path to your image
+        style={styles.image}
+      />
       <TouchableOpacity onPress={handleopenCreate} style={styles.newRecord}>
         <Text style={styles.NewRText}>New Record</Text>
       </TouchableOpacity>
@@ -354,141 +358,161 @@ const Main = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#439176',
-    alignItems: 'stretch',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 10,
-  },
-  itemContainer: {
-    borderWidth: 2,
-    borderColor: '#000000',
-    marginBottom: 5,
-    backgroundColor: "black",
-    position:'relative'
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#000000',
-    paddingBottom: 5,
-    marginBottom: 5,
-  },
-  headerText: {
-    fontWeight: 'bold',
-    flex: 1,
-    color: "white",
-    textAlign: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#CCCCCC',
-    paddingVertical: 10,
-    width: '90%',
-    marginLeft: 70,
-    position: 'relative'
-  },
-  cell: {
-    flex: 1,
-    textAlign: 'center',
-    color: "black",
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    backgroundColor: 'white',
-  },
-  paginationContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  paginationText: {
-    marginHorizontal: 10,
-    fontSize: 16,
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    left:1,
-    alignItems: 'center',
-    height: 50,
-    marginBottom: 10,
-  },
-  headerOptions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginRight: 10,
-  },
-  showOtherDatabaseText: {
-    fontWeight: 'bold',
-    marginRight: 10,
-    color: 'black',
-    fontSize: 20,
-  },
-  goBackText: {
-    fontWeight: 'bold',
-    color: 'black',
-    fontSize: 20,
-  },
-  Hcell: {
-    color: "white",
-    width: '100%',
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-  switchDatabase: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  disabledText: {
-    color: '#F2ECEC',
-  },
-  SearchBar: {
-    left: 1200,
-    width: 200,
-    height: 60
-  },
-  noItemText: {
-    fontSize: 100,
-  },
-  editIcon: {
-    padding: 5,
-    backgroundColor: '#E8AC13',
-    borderRadius: 3,
-  },
-  deleteIcon:{
-    padding:5,
-    backgroundColor:'#BA0505',
-    borderRadius:3
-  },
-  editCell: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 10,
-    flexDirection:'row'
-  },
-  blankcell: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight:95
-  },
-  newRecord:{
-    backgroundColor:'#32FDFE',
-    width:90,
-    top:55,
-    left:80,
-    height:30,
-    justifyContent:'center',
-    borderRadius:5
-  },
-  NewRText:{
-    fontWeight:'bold',
-    fontSize:15,
-    marginLeft:2
-  }
-});
+    container: {
+      flex: 1,
+      backgroundColor: '#439176',
+      alignItems: 'stretch',
+      justifyContent: 'flex-start',
+      paddingHorizontal: '5%', // Use percentage for padding
+    },
+    SearchBarContainer: {
+      bottom:'15%',
+      justifyContent:'flex-end',
+      alignItems: 'flex-end', // Center items vertically
+      flexDirection:'row',
+     flex:1,
+   
+ 
+    },
+    itemContainer: {
+      borderWidth: 2,
+      borderColor: '#000000',
+      marginBottom: 5,
+      backgroundColor: "black",
+      position: 'relative'
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      borderBottomWidth: 1,
+      borderBottomColor: '#000000',
+      paddingBottom: 5,
+      marginBottom: 5,
+    },
+    headerText: {
+      fontWeight: 'bold',
+      flex: 1,
+      color: "white",
+      textAlign: 'center',
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      borderBottomWidth: 1,
+      borderBottomColor: '#CCCCCC',
+      paddingVertical: 10,
+      width: '100%', // Use percentage for width
+      paddingHorizontal: '5%', // Use percentage for horizontal padding
+      position: 'relative'
+    },
+    cell: {
+      flex: 1,
+      textAlign: 'center',
+      color: "black",
+      borderWidth: 1,
+      borderColor: '#CCCCCC',
+      backgroundColor: 'white',
+    },
+    paginationContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 10,
+    },
+    paginationText: {
+      marginHorizontal: 10,
+      fontSize: 16,
+    },
+    headerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: 50,
+      marginBottom: 10,
+    },
+    headerOptions: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginRight: '5%', // Use percentage for margin
+      bottom:'20%'
+    },
+    showOtherDatabaseText: {
+      fontWeight: 'bold',
+      marginRight: 10,
+      color: 'black',
+      fontSize: 20,
+    },
+    goBackText: {
+      fontWeight: 'bold',
+      color: 'black',
+      fontSize: 20,
+      flex:1,
+    },
+    Hcell: {
+      color: "white",
+      width: '100%',
+      textAlign: 'center',
+      fontWeight: 'bold',
+      fontSize: 15,
+    },
+    disabledText: {
+      color: '#F2ECEC',
+    },
+    SearchBar: {
+      // flex: 1, // No need for flex here
+      width: '30%', // Adjust width as needed
+      height: 60,
+      bottom: 10,
+    },
+    noItemText: {
+      fontSize: 100,
+    },
+    editIcon: {
+      padding: 5,
+      backgroundColor: '#E8AC13',
+      borderRadius: 3,
+    },
+    deleteIcon: {
+      padding: 5,
+      backgroundColor: '#BA0505',
+      borderRadius: 3
+    },
+    editCell: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 10,
+      flexDirection: 'row'
+    },
+    blankcell: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: '5%', // Use percentage for margin
+    },
+    newRecord: {
+      backgroundColor: '#32FDFE',
+      width: '7%', // Use percentage for width
+      top: 55,
+      left: '5%', // Use percentage for left position
+      height: 30,
+      justifyContent: 'center',
+      borderRadius: 5
+    },
+    NewRText: {
+      fontWeight: 'bold',
+      fontSize: 15,
+      marginLeft: 2
+    },
+    image: {
+      position: 'absolute',
+      top: 0,
+      left: '50%', // Use percentage for left position
+      width: 100,
+      height: 100,
+      resizeMode: 'cover',
+    },
+    dbNavigation:{
+      flex:1
+    }
+  });
+  
+
 
 export default Main;

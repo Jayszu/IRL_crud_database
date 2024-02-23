@@ -43,11 +43,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#CCCCCC',
+    borderColor: 'black',
     borderRadius: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 5,
-    marginVertical: 8,
+    paddingVertical: "1%",
+    width:'20%'
   },
   input: {
     flex: 1,

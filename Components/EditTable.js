@@ -37,7 +37,7 @@ const EditTable = ({
         throw new Error('Record ID not found');
       }
   
-      console.log(recordId);
+      
   
       // Fields common to both databases
       const commonFields = {
