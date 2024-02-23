@@ -209,7 +209,11 @@ const Main = () => {
   const DatabaseHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.headerOptions}>
-        
+        <View style={styles.SearchBarContainer}>
+          <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage} style={styles.SearchBar}/>
+        </View>
+        </View>
+       <View style={styles.databaseOption}>
         <TouchableOpacity
           disabled={currentDatabase === 'IRL_Inventory' || !previousDatabase}
           onPress={goBackToPreviousDatabase}
@@ -236,12 +240,7 @@ const Main = () => {
             Chemicals
           </Text>
         </TouchableOpacity>
-        <View style={styles.SearchBarContainer}>
-          <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage} style={styles.SearchBar}/>
-        </View>
-        </View>
-  
-    </View>
+    </View></View>
   );
 
    const renderItem = ({ item, index }) => {
@@ -432,7 +431,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginRight: '5%', // Use percentage for margin
-      bottom:'20%'
+      bottom:'-20%'
     },
     showOtherDatabaseText: {
       fontWeight: 'bold',
@@ -510,6 +509,13 @@ const styles = StyleSheet.create({
     },
     dbNavigation:{
       flex:1
+    },
+    databaseOption:{
+      flexDirection:'row',
+      justifyContent:'space-between',
+      right:'80%',
+      bottom:"-20%"
+      
     }
   });
   

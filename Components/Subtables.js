@@ -7,6 +7,7 @@ import SearchBar from './SearchBar';
 import EditTable from './EditTable';
 import Delete from './Delete';
 
+const ITEMS_PER_PAGE = 10;
 
 const SubTables = ({ route }) => {
   const { selectedItem, setSelectedItem } = route.params;
@@ -17,7 +18,7 @@ const SubTables = ({ route }) => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-
+  const [PreviousPage,setPreviousPage]= useState()
   useEffect(() => {
     fetchData();
   }, [currentPage]);
@@ -32,6 +33,8 @@ const SubTables = ({ route }) => {
         }
       });
 
+      const totalRecordsCount = record.length;
+      setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
       if (response.ok) {
         const data = await response.json();
         const formattedData = data.records.map(record => ({
@@ -55,7 +58,7 @@ const SubTables = ({ route }) => {
       console.error('Error fetching data:', error);
     }
   };
-  
+ 
 
   const handleRefresh = () => {
     setEditModalVisible(false);
@@ -174,7 +177,7 @@ const SubTables = ({ route }) => {
       />
 
 <FlatList
-  data={tableData.slice(0, 10)} // Slice the tableData array to include items from index 0 to 9
+  data={tableData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
   renderItem={({ item, index }) => renderItem({ item, index })}
   keyExtractor={(item, index) => index.toString()}
   ListEmptyComponent={<Text>No data available</Text>} // Add this to see if there's any issue with data retrieval

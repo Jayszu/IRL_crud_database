@@ -3,6 +3,9 @@ import React from 'react';
 import { Popup,ScrollView, ScrollViewBase } from 'react-native-windows';
 import { useState,useEffect } from 'react';
 
+
+
+
 const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
   const [dateR, setDateR] = useState();
   const [location, setLocation] = useState('');
@@ -16,6 +19,8 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
   const [releasedBy, setReleasedB] = useState('');
   const [currentB, setCurrentB] = useState('');
   const [dateUpdated, setdateUpdated] = useState('');
+ 
+  
  console.log(currentDatabase)
   const closeState = () =>{
     setDateR('');
@@ -41,7 +46,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
         Lot: lot,
         Expiry: expiry,
         'Previous Balance': prevBalance,
-        'Quantity Release': quantityR,
+        'Quantity Released': quantityR,
         'Released by': releasedBy, 
         'Current Balance': currentB, 
         'Date Updated': dateUpdated, 
@@ -67,7 +72,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
           throw new Error(errorMessage);
       }
          //refresg
-        
+          handleRefresh();
           closeState();
          // Close the popup
          onClose();
@@ -78,12 +83,10 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
 
   return (
     <Popup isOpen={isOpen} onDismiss={onClose} verticalOffset={40}>
-        <ScrollView style={{height:600}} keyboardShouldPersistTaps="handled">
+        <ScrollView style={{height:600}} keyboardShouldPersistTaps="always">
       <View style={styles.container}>
      
-      <TouchableOpacity onPress={() => {
-      onClose();
-      closeState();}}
+      <TouchableOpacity onPress={onClose}
        style={styles.closeButton}>
           <Text style={styles.closeButtonText}>Close</Text>
         </TouchableOpacity>
@@ -150,7 +153,12 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
                 style={styles.input}
                 placeholder="Previous Balance..."
                 value={prevBalance}
-              onChangeText={setPrevBalance}
+                onChangeText={(text) => {
+                  // Remove any non-numeric characters from the input
+                  const balanceValue = text.replace(/[^0-9]/g, '');
+                  // Update the state with the cleaned numeric value
+                  setPrevBalance(parseInt(balanceValue));
+                }}
               />
               </View>
               <View style={styles.fieldContainer}>
@@ -159,7 +167,12 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
                 style={styles.input}
                 placeholder="Quantity Released..."
                 value={quantityR}
-              onChangeText={setQuantityR}
+                onChangeText={(text) => {
+                  // Remove any non-numeric characters from the input
+                  const quantityValue = text.replace(/[^0-9]/g, '');
+                  // Update the state with the cleaned numeric value
+                  setQuantityR(parseInt(quantityValue));
+                }}
               />
               </View>
               <View style={styles.fieldContainer}>
@@ -177,7 +190,12 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
                 style={styles.input}
                 placeholder="Current Balance..."
                 value={currentB}
-              onChangeText={setCurrentB}
+                onChangeText={(text) => {
+                  // Remove any non-numeric characters from the input
+                  const currValue = text.replace(/[^0-9]/g, '');
+                  // Update the state with the cleaned numeric value
+                  setCurrentB(parseInt(currValue));
+                }}
               />
               </View>
               <View style={styles.fieldContainer}>
