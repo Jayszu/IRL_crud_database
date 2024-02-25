@@ -11,7 +11,6 @@ import { useNavigation } from '@react-navigation/native';
 
 
 
-const ITEMS_PER_PAGE = 10; // Number of items to fetch per page
 
 const Main = () => {
   const navigation = useNavigation();
@@ -26,6 +25,7 @@ const Main = () => {
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [PreviousPage,setPreviousPage]= useState()
+  const [ITEMS_PER_PAGE,setItemsPerPage] =useState(10)
   
 
   useEffect(() => {
@@ -240,6 +240,19 @@ const Main = () => {
             Chemicals
           </Text>
         </TouchableOpacity>
+        <View style={styles.itemPerPageContainer}>
+      <TouchableOpacity onPress={() => {
+  if (ITEMS_PER_PAGE > 1) {
+    setItemsPerPage(ITEMS_PER_PAGE - 1);
+  }
+}}>
+          <Text style={styles.adjustButton}>{'\u00AB'}</Text>
+        </TouchableOpacity>
+          <Text style={[styles.itemPerPageText, { marginRight:5, marginLeft:5 }]}> Items per Page: {ITEMS_PER_PAGE} </Text>
+          <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
+          <Text style={styles.adjustButton}>{'\u00BB'}</Text>
+          </TouchableOpacity>
+        </View>
     </View></View>
   );
 
@@ -274,8 +287,8 @@ const Main = () => {
     // Render other items in the list
     return (
       <View style={styles.row}>
-        <TouchableOpacity onPress={() => handleItemClick(item)} style={[styles.cell, styles.touchableCell]}>
-          <Text>{item.Item}</Text>
+        <TouchableOpacity onPress={() => handleItemClick(item)} style={[styles.cell,styles.touchableCell]}>
+          <Text style={styles.cell}>{item.Item}</Text>
         </TouchableOpacity>
         <Text style={styles.cell}>{item.Location}</Text>
         <Text style={styles.cell}>{item.TotalQty}</Text>
@@ -421,6 +434,7 @@ const styles = StyleSheet.create({
     paginationText: {
       marginHorizontal: 10,
       fontSize: 16,
+      color:"black"
     },
     headerContainer: {
       flexDirection: 'row',
@@ -517,6 +531,8 @@ const styles = StyleSheet.create({
       right:'80%',
       bottom:"-20%"
       
+    }, touchableCell:{
+      color:'black'
     }
   });
   
