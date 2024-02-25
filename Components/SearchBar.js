@@ -51,7 +51,8 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     marginLeft: 10,
-    color: 'black',
+    color: 'white',
+    backgroundColor:'#1F1B1A'
   },
   clearIcon: {
     width: 24,
