@@ -6,6 +6,7 @@ import CreateSub from './CreateSub';
 import SearchBar from './SearchBar';
 import EditTable from './EditTable';
 import Delete from './Delete';
+import Airtable from 'airtable';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -13,52 +14,74 @@ const SubTables = ({ route }) => {
   const { selectedItem, setSelectedItem } = route.params;
   const [tableData, setTableData] = useState([]);
   const navigation = useNavigation();
+  const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState('');
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [currentDatabase, setCurrentDatabase] = useState(`${selectedItem.Item}`);
   const [PreviousPage,setPreviousPage]= useState()
+  const [searchQuery, setSearchQuery] = useState('');
+  const [ITEMS_PER_PAGE, setItemsPerPage] = useState(10);
+
   useEffect(() => {
     fetchData();
-  }, [currentPage]);
-
+  }, [currentPage,currentDatabase,searchQuery]);
   const fetchData = async () => {
-    try {
-      const response = await fetch(`https://api.airtable.com/v0/appzQzVWNYXH8WNks/${selectedItem.Item}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3',
-          'Content-Type': 'application/json'
-        }
-      });
-  
-      if (response.ok) {
-        const data = await response.json();
-        const totalRecordsCount = data.records.length;
-        setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
-        
-        const formattedData = data.records.map(record => ({
-          DateR: record.fields['Date of Release'],
-          Packing: record.fields['Packing'],
-          Location: record.fields['Location'],
-          Lot: record.fields['Lot'],
-          Expiry: record.fields['Expiry'],
-          PrevB: record.fields['Previous Balance'],
-          QuanR: record.fields['Quantity Released'],
-          ReleasedB: record.fields['Released by'],
-          CurrB: record.fields['Current Balance'],
-          DateU: record.fields['Date Updated'],
-        }));
-        setTableData(formattedData);
+  const base = new Airtable({ apiKey: 'patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3' })
+  .base('appzQzVWNYXH8WNks');
+
+try {
+  const records = await base(currentDatabase).select({
+    view: 'Grid view',
+    filterByFormula: searchQuery ? `SEARCH("${searchQuery.toLowerCase()}", LOWER({ITEM}))` : '', 
+    
+  }).all();
+
+  // Calculate total pages based on the total number of records
+  const totalRecordsCount = records.length;
+  setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
+
+        const newData = records.map(record => ({
       
-      } else {
-        console.error('Failed to fetch data');
+          DateR: String(record.get('Date of Release')),
+          Packing: String(record.get('Packing') || ''),
+          Brand: String(record.get('Brand') || ''),
+          Location: String(record.get('Location') || ''),
+          Lot: String(record.get('Lot') || ''),
+          Expiry: (record.get('Expiry')), // Parses the value to a floating-point number
+          PrevB: parseInt(record.get('Previous Balance') || ''),
+          QuanR: parseInt(record.get('Quantity Released') || ''),
+          ReleasedB: String(record.get('Released by') || ''),
+          CurrB: parseInt(record.get('Current Balance') || ''),
+          DateU: String(record.get('Date Updated') || ''),
+          
+        }));
+        const dataWithHeader = [
+          {
+            DateR: 'Date of Release',
+            Packing: 'Packing',
+            Brand: 'Brand',
+            Location: "Location",
+            Lot: 'Lot',
+            Expiry: 'Expiry',
+            PrevB: 'Previous Balance',
+            QuanR: 'Quantity Released',
+            ReleasedB: 'Released by',
+            CurrB: 'Current Balance',
+            DateU: 'Date Updated',
+          },
+          ...newData,
+        ];
+
+        setData(dataWithHeader);
+      
+      } catch (err) {
+        console.error(err);
       }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
+    };
+  
   
  
   const handleRefresh = () => {
@@ -72,13 +95,13 @@ const SubTables = ({ route }) => {
     setCreateModalVisible(true);
   };
 
-  const handleEditItem = (rowData) => {
-    setSelectedItem(rowData);
+  const handleEditItem = (item) => {
+    setSelectedItem(item);
     setEditModalVisible(true);
   };
 
-  const handleDeleteItem = (rowData) => {
-    setSelectedItem(rowData);
+  const handleDeleteItem = (item) => {
+    setSelectedItem(item);
     setDeleteModalVisible(true);
   };
 
@@ -94,8 +117,24 @@ const SubTables = ({ route }) => {
     }
   };
   const handleSearch = (query) => {
-  return null;
+    setSearchQuery(query);
+    // Only reset the current page if a search query is provided
+    if (query) {
+      // Set the currentPage to its previous value if it's not already 1
+      if (currentPage !== 1) {
+        setPreviousPage((prevPage) => {
+          // Store the previous page value in a variable
+          const previousPage = prevPage;
+          // Reset the currentPage to 1
+          setCurrentPage(currentPage);
+        if ({goToPreviousPage})
+          return previousPage;
+        console.log(previousPage)
+        });
+      }
+    }
   };
+
   const handlegoBack =() =>{
     console.log('gone back')
     navigation.navigate('Main');
@@ -104,9 +143,23 @@ const SubTables = ({ route }) => {
   const DatabaseHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.headerOptions}>
+      <View style={styles.itemPerPageContainer}>
+      <TouchableOpacity onPress={() => {
+  if (ITEMS_PER_PAGE > 1) {
+    setItemsPerPage(ITEMS_PER_PAGE - 1);
+  }
+}}>
+          <Text style={styles.adjustButton}>{'\u00AB'}</Text>
+        </TouchableOpacity>
+          <Text style={[styles.itemPerPageText, { marginRight:5, marginLeft:5 }]}> Items per Page: {ITEMS_PER_PAGE} </Text>
+          <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
+          <Text style={styles.adjustButton}>{'\u00BB'}</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.SearchBarContainer}>
           <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage} style={styles.SearchBar}/>
         </View>
+       
         </View>
     </View>
   );
@@ -132,7 +185,7 @@ const SubTables = ({ route }) => {
       );
     }
     // Render "No item found" text if there are no items
-    if (tableData.length === 0) {
+    if (data.length === 0) {
       return (
         <View style={[styles.row, { justifyContent: 'center', paddingVertical: 10 }]}>
           <Text style={styles.noItemText}>No item found</Text>
@@ -186,18 +239,19 @@ const SubTables = ({ route }) => {
       />
 
 <FlatList
-  data={tableData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
-  renderItem={({ item, index }) => renderItem({ item, index })}
-  keyExtractor={(item, index) => index.toString()}
-  ListEmptyComponent={<Text>No data available</Text>} // Add this to see if there's any issue with data retrieval
-  ListFooterComponent={
-    <View style={styles.paginationContainer}>
-      <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
-      <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
-      <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
-    </View>
-  }
-/>
+      data={data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
+      renderItem={({ item, index }) => renderItem({ item, index })}
+      keyExtractor={(item, index) => index.toString()}
+      ListEmptyComponent={<Text>No data available</Text>}
+      ListFooterComponent={
+        <View style={styles.paginationContainer}>
+          <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
+          <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
+          <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+        </View>
+      }
+    />
+
 
 
 
@@ -353,6 +407,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: '8%', // Use percentage for margin
   },
+  itemPerPageContainer:{
+    flexDirection:'row',
+    borderWidth:2,
+    backgroundColor:'#D1CDCC',
+    width:"15%",
+    marginLeft:"15%",
+    top:"20%"
+  },
+  itemPerPageText:{
+    color:'black'
+  },
+  adjustButton:{
+    color:'black'
+
+  }
 });
 
 export default SubTables;
