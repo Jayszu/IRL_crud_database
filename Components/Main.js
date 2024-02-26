@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, Image, TextInput } from 'react-native';
 import Airtable from 'airtable';
 import TitleHeader from './TitleHeader';
 import SearchBar from './SearchBar';
@@ -16,7 +16,7 @@ const Main = () => {
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState('');
+  const [totalPages, setTotalPages] = useState();
   const [currentDatabase, setCurrentDatabase] = useState('IRL_Lab_Supplies'); // Default database
   const [previousDatabase, setPreviousDatabase] = useState(''); // Previous database
   const [searchQuery, setSearchQuery] = useState('');
@@ -142,6 +142,7 @@ const Main = () => {
   };
 
   const handleDeleteItem = (item) => {
+  
     setSelectedItem(item);
     setDeleteModalVisible(true);
   };
@@ -240,19 +241,7 @@ const Main = () => {
             Chemicals
           </Text>
         </TouchableOpacity>
-        <View style={styles.itemPerPageContainer}>
-      <TouchableOpacity onPress={() => {
-  if (ITEMS_PER_PAGE > 1) {
-    setItemsPerPage(ITEMS_PER_PAGE - 1);
-  }
-}}>
-          <Text style={styles.adjustButton}>{'\u00AB'}</Text>
-        </TouchableOpacity>
-          <Text style={[styles.itemPerPageText, { marginRight:5, marginLeft:5 }]}> Items per Page: {ITEMS_PER_PAGE} </Text>
-          <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
-          <Text style={styles.adjustButton}>{'\u00BB'}</Text>
-          </TouchableOpacity>
-        </View>
+       
     </View></View>
   );
 
@@ -336,17 +325,47 @@ const Main = () => {
       keyExtractor={(item, index) => index.toString()}
       ListEmptyComponent={<Text>No data available</Text>}
       ListFooterComponent={
-        <View style={styles.paginationContainer}>
-          <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
-          <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
-          <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+        <View>
+          <View style={styles.paginationContainer}>
+            <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
+            <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
+            <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+          </View>
+          <View style={styles.itemPerPageContainer}>
+            <TouchableOpacity onPress={() => {
+              if (ITEMS_PER_PAGE > 1) {
+                setItemsPerPage(ITEMS_PER_PAGE - 1);
+              }
+            }}>
+              <Text style={styles.adjustButton}>{'\u00AB   '}</Text>
+            </TouchableOpacity>
+            <Text style={styles.itemPerPageText}> Show</Text>
+            <TextInput
+              style={styles.textInput}
+              value={String(ITEMS_PER_PAGE)} // Convert to string as TextInput expects string value
+              keyboardType="numeric"
+              onChangeText={(value) => {
+                // Check if the value is empty or contains a valid number
+                if (value === '' || !isNaN(parseInt(value))) {
+                  // If the value is empty, set items per page to 0
+                  // Otherwise, update items per page with the new value
+                  setItemsPerPage(value === '' ? 0 : parseInt(value));
+                }
+              }}
+            />
+          <Text style={styles.itemPerPageText2}>  Entries</Text>
+            <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
+              <Text style={styles.adjustButton2}>{' \u00BB'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       }
+      
     />
       <EditTable
-      handleBackspace={handleBackspace}
         isOpen={editModalVisible}
         onClose={() => setEditModalVisible(false)}
+        handleBackspace={handleBackspace}
         selectedItem={selectedItem}
         handleItemChange={handleItemChange}
         handleLocationChange={handleLocationChange}
@@ -533,6 +552,42 @@ const styles = StyleSheet.create({
       
     }, touchableCell:{
       color:'black'
+    },
+    itemPerPageContainer:{
+      flexDirection:'row',
+      bottom:'3%',
+      
+    },
+    itemPerPageText:{
+      color:'black',
+      fontWeight:"500",
+      top:'0.3%',
+     
+    },
+    itemPerPageText2:{
+      color:'black',
+      fontWeight:'500',
+      top:'0.4%',
+      
+    },
+    adjustButton:{
+      color:'#F4ECEC',
+      bottom:'12%',
+      fontSize:25,
+      fontWeight:'bold',
+      marginRight:'0.3%'
+    },
+    adjustButton2:{
+      color:"#F4ECEC",
+      fontSize:25,
+      bottom:"12%",
+      fontWeight:'bold'
+    },
+    textInput:{
+      width:'3%',
+      height:'80%',
+      marginLeft:'0.3%',
+      
     }
   });
   

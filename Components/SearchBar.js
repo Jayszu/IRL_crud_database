@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     color: 'white',
-    backgroundColor:'#1F1B1A'
+    backgroundColor:'#666666'
   },
   clearIcon: {
     width: 24,

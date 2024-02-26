@@ -91,7 +91,7 @@ const EditTable = ({
     <Popup
       isOpen={isOpen}
       onDismiss={onClose}
-      verticalOffset={40} // Adjust as needed
+      verticalOffset={40}
     >
       <View style={styles.container}>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -106,6 +106,7 @@ const EditTable = ({
               value={selectedItem.Item}
               onChangeText={(text) => handleItemChange(text)}
               placeholder="Item Name..."
+              placeholderTextColor='white'
             />
           </View>
           <View style={styles.fieldContainer}>
@@ -115,19 +116,21 @@ const EditTable = ({
               value={selectedItem.Location}
               onChangeText={(text) => handleLocationChange(text)}
               placeholder="Location..."
+              placeholderTextColor='white'
             />
           </View>
-          
           {currentDatabase !== 'IRL_Chemicals' && (
             <View style={styles.fieldContainer}>
-            <Text style={styles.Desc}>Description</Text>
-            <TextInput
-              style={styles.input}
-              value={selectedItem.Description}
-              onChangeText={(text) => handleDescriptionChange(text)}
-              placeholder="Description..."
-            />
-        </View> )}
+              <Text style={styles.Desc}>Description</Text>
+              <TextInput
+                style={styles.input}
+                value={selectedItem.Description}
+                onChangeText={(text) => handleDescriptionChange(text)}
+                placeholder="Description..."
+                placeholderTextColor='white'
+              />
+            </View>
+          )}
           <View style={styles.fieldContainer}>
             <Text style={styles.Desc}>Total Quantity</Text>
             <TextInput
@@ -141,6 +144,7 @@ const EditTable = ({
                 }
               }}
               placeholder="Total Quantity..."
+              placeholderTextColor='white'
             />
           </View>
           <View style={styles.fieldContainer}>
@@ -150,6 +154,7 @@ const EditTable = ({
               value={selectedItem.Brand}
               onChangeText={(text) => handleBrandChange(text)}
               placeholder="Brand..."
+              placeholderTextColor='white'
             />
           </View>
           <View style={styles.fieldContainer}>
@@ -159,6 +164,7 @@ const EditTable = ({
               value={selectedItem.Packing}
               onChangeText={(text) => handlePackingChange(text)}
               placeholder="Packing..."
+              placeholderTextColor='white'
             />
           </View>
           <View style={styles.fieldContainer}>
@@ -168,6 +174,7 @@ const EditTable = ({
               value={selectedItem.DateReceived}
               onChangeText={(text) => handleDateRChange(text)}
               placeholder="Date Received..."
+              placeholderTextColor='white'
             />
           </View>
           <View style={styles.fieldContainer}>
@@ -177,6 +184,7 @@ const EditTable = ({
               value={selectedItem.ExpirationDate}
               onChangeText={(text) => handleExpDChange(text)}
               placeholder="Expiration Date..."
+              placeholderTextColor='white'
             />
           </View>
         </View>
@@ -190,24 +198,29 @@ const EditTable = ({
 
 const styles = StyleSheet.create({
   container: {
-    height: 680,
-    width: 800, // Adjust the width of the popup container
-    backgroundColor: 'rgba(199, 199, 199, 0.8)',
+    maxHeight: 600,
+    width: 800,
+    backgroundColor: 'rgba(102, 102, 102, 1)',
     padding: 20,
     borderRadius: 25,
-    position: 'relative', // Required for positioning the close button
+    position: 'relative',
+    overflow: 'scroll',
   },
   fieldsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
     marginTop: 20,
   },
   fieldContainer: {
+    width: "48%",
     marginBottom: 10,
   },
   closeButton: {
     position: 'absolute',
     top: 10,
     right: 10,
-    zIndex: 1, // Ensure the close button appears above other elements
+    zIndex: 1,
   },
   closeButtonText: {
     color: '#D11111',
@@ -223,10 +236,12 @@ const styles = StyleSheet.create({
   },
   input: {
     height: 40,
-    width: '100%', // Adjust the width of the text field
+    width: "100%",
     paddingHorizontal: 10,
-    borderRadius:15,
-    justifyContent:'center'
+    borderRadius: 15,
+    justifyContent: "center",
+    backgroundColor: "#1F1B1A",
+    color: 'white'
   },
   updateButton: {
     backgroundColor: 'blue',

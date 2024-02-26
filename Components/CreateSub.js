@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity,TextInput, } from 'react-native';
 import React from 'react';
-import { Popup,ScrollView, ScrollViewBase } from 'react-native-windows';
+import { Popup,ScrollView } from 'react-native-windows';
 import { useState,useEffect } from 'react';
 
 
@@ -21,7 +21,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
   const [dateUpdated, setdateUpdated] = useState('');
  
   
- console.log(currentDatabase)
+
   const closeState = () =>{
     setDateR('');
     setLocation('');
@@ -83,7 +83,6 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
 
   return (
     <Popup isOpen={isOpen} onDismiss={onClose} verticalOffset={40}>
-        <ScrollView style={{height:600}} keyboardShouldPersistTaps="always">
       <View style={styles.container}>
      
       <TouchableOpacity onPress={onClose}
@@ -97,6 +96,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Date Released..."
+                placeholderTextColor='white'
                 value={dateR}
                 onChangeText={setDateR}
               />
@@ -106,6 +106,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Location..."
+                placeholderTextColor='white'
                 value={location}
               onChangeText={setLocation}
               />
@@ -115,6 +116,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Packing..."
+                placeholderTextColor='white'
                 value={packing}
               onChangeText={setPacking}
               />
@@ -124,6 +126,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Brand"
+                placeholderTextColor='white'
                 value={brand}
                 onChangeText={setBrand}
               />
@@ -134,6 +137,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Lot..."
+                placeholderTextColor='white'
                 value={lot}
               onChangeText={setLot}
               />
@@ -143,6 +147,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Expiry..."
+                placeholderTextColor='white'
                 value={expiry}
               onChangeText={setExpiry}
               />
@@ -152,6 +157,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Previous Balance..."
+                placeholderTextColor='white'
                 value={prevBalance}
                 onChangeText={(text) => {
                   // Remove any non-numeric characters from the input
@@ -166,6 +172,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Quantity Released..."
+                placeholderTextColor='white'
                 value={quantityR}
                 onChangeText={(text) => {
                   // Remove any non-numeric characters from the input
@@ -180,6 +187,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Released By..."
+                placeholderTextColor='white'
                 value={releasedBy}
               onChangeText={setReleasedB}
               />
@@ -189,6 +197,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Current Balance..."
+                placeholderTextColor='white'
                 value={currentB}
                 onChangeText={(text) => {
                   // Remove any non-numeric characters from the input
@@ -203,6 +212,7 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Date Updated..."
+                placeholderTextColor='white'
                 value={dateUpdated}
               onChangeText={setdateUpdated}
               />
@@ -212,19 +222,19 @@ const CreateSub = ({ isOpen, onClose,handleRefresh,selectedItem }) => {
             <Text style={styles.PostButtonText}>Create Record</Text>
           </TouchableOpacity>
         </View>
-    </ScrollView>
     </Popup>
   )
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: 880,
+    maxHeight: 600, // Set a maximum height
     width: 800,
-    backgroundColor: 'rgba(199, 199, 199, 0.8)',
+    backgroundColor: 'rgba(102, 102, 102, 1)',
     padding: 20,
     borderRadius: 25,
     position: 'relative',
+    overflow: 'scroll', // Allow scrolling if content exceeds max height
   },
   newRecord: {
     backgroundColor: '#32FDFE',
@@ -240,6 +250,7 @@ const styles = StyleSheet.create({
     left: 10,
     fontWeight: 'bold',
     fontSize: 20,
+    color:"white"
   },
   Desc:{
     fontWeight:'700'
@@ -247,18 +258,25 @@ const styles = StyleSheet.create({
   Fieldtext:{ 
     fontWeight:'700'
 },
-fieldscontainer:{
-    marginTop:20
+fieldscontainer: {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  marginTop: 20,
 },
-fieldContainer:{
-    marginBottom:10
+fieldContainer: {
+  width: "48%", // Adjust based on your preference
+  marginBottom: 10,
 },
-input:{
-    height: 40,
-    width: '100%', // Adjust the width of the text field
-    paddingHorizontal: 10,
-    borderRadius:15,
-    justifyContent:'center'
+input: {
+  height: 40,
+  width: "100%", // Adjust the width of the text field
+  paddingHorizontal: 10,
+  borderRadius: 15,
+  justifyContent: "center",
+  backgroundColor:'#1F1B1A',
+  color:'white',
+  
 },
   closeButton: {
     position: 'absolute',

@@ -1,29 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Button, Image } from 'react-native';
+import { View,TextInput, Text, StyleSheet, TouchableOpacity, FlatList, Button, Image} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import AnimatedText from './AnimatedText';
 import TitleHeader from './TitleHeader';
 import CreateSub from './CreateSub';
 import SearchBar from './SearchBar';
-import EditTable from './EditTable';
-import Delete from './Delete';
+import EditSub from './EditSub';
+import DeleteSub from './DeleteSub';;
 import Airtable from 'airtable';
 
-const ITEMS_PER_PAGE = 10;
 
 const SubTables = ({ route }) => {
   const { selectedItem, setSelectedItem } = route.params;
-  const [tableData, setTableData] = useState([]);
+
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState('');
-  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editModalVisibleSub, setEditModalVisibleSub] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deleteModalVisibleSub, setDeleteModalVisibleSub] = useState(false);
   const [currentDatabase, setCurrentDatabase] = useState(`${selectedItem.Item}`);
   const [PreviousPage,setPreviousPage]= useState()
   const [searchQuery, setSearchQuery] = useState('');
   const [ITEMS_PER_PAGE, setItemsPerPage] = useState(10);
+  const [selectedSubItem, setselectedSubItem] =useState(null)
 
   useEffect(() => {
     fetchData();
@@ -44,7 +45,7 @@ try {
   setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
 
         const newData = records.map(record => ({
-      
+          Id: String(record.get('Id')),
           DateR: String(record.get('Date of Release')),
           Packing: String(record.get('Packing') || ''),
           Brand: String(record.get('Brand') || ''),
@@ -85,9 +86,9 @@ try {
   
  
   const handleRefresh = () => {
-    setEditModalVisible(false);
+    setEditModalVisibleSub(false);
     setCreateModalVisible(false);
-    setDeleteModalVisible(false);
+    setDeleteModalVisibleSub(false);
     fetchData();
     
   };
@@ -96,13 +97,15 @@ try {
   };
 
   const handleEditItem = (item) => {
-    setSelectedItem(item);
-    setEditModalVisible(true);
+    setselectedSubItem(item);
+    setEditModalVisibleSub(true);
+  
   };
 
   const handleDeleteItem = (item) => {
-    setSelectedItem(item);
-    setDeleteModalVisible(true);
+    setselectedSubItem(item);
+    setDeleteModalVisibleSub(true);
+    console.log(selectedSubItem)
   };
 
   const goToNextPage = () => {
@@ -135,27 +138,84 @@ try {
     }
   };
 
+  const handleBackspace = () => {
+    setSelectedItem(prevState => ({
+      ...prevState,
+      TotalQty: prevState.TotalQty.slice(0, -1) // Remove the last character
+    }));
+  };
+
   const handlegoBack =() =>{
     console.log('gone back')
     navigation.navigate('Main');
     
   };
+  const handleDateRChange = (text) => {
+    setselectedSubItem(prevItem => ({ ...prevItem, DateR: text }));
+  };
+
+  const handleLocationChange = (text) => {
+    setselectedSubItem(prevItem => ({ ...prevItem, Location: text }));
+  };
+
+  const handlePackingChange = (text) => {
+    setselectedSubItem(prevItem => ({ ...prevItem, Packing: text }));
+  };
+
+  const handleLotChange = (text) => {
+    setselectedSubItem(prevItem => ({ ...prevItem, Lot: text }));
+  };
+ 
+  const handleExpiryChange = (text) => {
+    setselectedSubItem(prevItem => ({ ...prevItem, Expiry: text }));
+  };
+
+  const handlePrevBChange = (text) => {
+    // Allow backspace or if the input is a valid number
+    if (text === '' || /^\d+$/.test(text)) {
+      const intValue = text === '' ? '' : parseInt(text); // Parse to integer
+      setselectedSubItem(prevState => ({
+        ...prevState,
+        PrevB: intValue
+      }));
+    }
+  };
+
+  const handleQuanRChange = (text) => {
+   // Allow backspace or if the input is a valid number
+   if (text === '' || /^\d+$/.test(text)) {
+    const intValue = text === '' ? '' : parseInt(text); // Parse to integer
+    setselectedSubItem(prevState => ({
+      ...prevState,
+      QuanR: intValue
+    }));
+  }
+  };
+
+  const handleReleasedBChange = (text) => {
+    setselectedSubItem(prevItem => ({ ...prevItem, ReleasedB: text }));
+  }; 
+  const handleCurrentBChange = (text) => {
+    // Allow backspace or if the input is a valid number
+    if (text === '' || /^\d+$/.test(text)) {
+      const intValue = text === '' ? '' : parseInt(text); // Parse to integer
+      setselectedSubItem(prevState => ({
+        ...prevState,
+        CurrB: intValue
+      }));
+    }
+  };
+  const handleDateUChange = (text) => {
+    setselectedSubItem(prevItem => ({ ...prevItem, DateU: text }));
+  };
+
+
+
   const DatabaseHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.headerOptions}>
-      <View style={styles.itemPerPageContainer}>
-      <TouchableOpacity onPress={() => {
-  if (ITEMS_PER_PAGE > 1) {
-    setItemsPerPage(ITEMS_PER_PAGE - 1);
-  }
-}}>
-          <Text style={styles.adjustButton}>{'\u00AB'}</Text>
-        </TouchableOpacity>
-          <Text style={[styles.itemPerPageText, { marginRight:5, marginLeft:5 }]}> Items per Page: {ITEMS_PER_PAGE} </Text>
-          <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
-          <Text style={styles.adjustButton}>{'\u00BB'}</Text>
-          </TouchableOpacity>
-        </View>
+        <AnimatedText selectedItem={selectedItem} />
+        
         <View style={styles.SearchBarContainer}>
           <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage} style={styles.SearchBar}/>
         </View>
@@ -244,28 +304,67 @@ try {
       keyExtractor={(item, index) => index.toString()}
       ListEmptyComponent={<Text>No data available</Text>}
       ListFooterComponent={
-        <View style={styles.paginationContainer}>
-          <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
-          <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
-          <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+        <View>
+          <View style={styles.paginationContainer}>
+            <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
+            <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
+            <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+          </View>
+          <View style={styles.itemPerPageContainer}>
+            <TouchableOpacity onPress={() => {
+              if (ITEMS_PER_PAGE > 1) {
+                setItemsPerPage(ITEMS_PER_PAGE - 1);
+              }
+            }}>
+              <Text style={styles.adjustButton}>{'\u00AB   '}</Text>
+            </TouchableOpacity>
+            <Text style={styles.itemPerPageText}> Show</Text>
+            <TextInput
+              style={styles.textInput}
+              value={String(ITEMS_PER_PAGE)} // Convert to string as TextInput expects string value
+              keyboardType="numeric"
+              onChangeText={(value) => {
+                // Check if the value is empty or contains a valid number
+                if (value === '' || !isNaN(parseInt(value))) {
+                  // If the value is empty, set items per page to 0
+                  // Otherwise, update items per page with the new value
+                  setItemsPerPage(value === '' ? 0 : parseInt(value));
+                }
+              }}
+            />
+          <Text style={styles.itemPerPageText2}>  Entries</Text>
+            <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
+              <Text style={styles.adjustButton2}>{' \u00BB'}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       }
+      
     />
-
-
-
-
-
-
-
-<EditTable
-     
-        isOpen={editModalVisible}
-        onClose={() => setEditModalVisible(false)}
+<EditSub
+        isOpen={editModalVisibleSub}
+        onClose={() => setEditModalVisibleSub(false)}
+        handleBackspace={handleBackspace}
+        selectedSubItem={selectedSubItem}
+        handleDateRChange={handleDateRChange}
+        handleLocationChange={handleLocationChange}
+        handlePackingChange={handlePackingChange}
+        handleLotChange={handleLotChange}
+        handleExpiryChange={handleExpiryChange}
+        handlePrevBChange={handlePrevBChange}
+        handleQuanRChange={handleQuanRChange}
+        handleReleasedBChange={handleReleasedBChange}
+        handleCurrentBChange={handleCurrentBChange}
+        handleDateUChange={handleDateUChange}
+        currentDatabase={currentDatabase}
+        handleRefresh={handleRefresh}
       />
-      <Delete
-        isOpen={deleteModalVisible}
-        onClose={() => setDeleteModalVisible(false)}
+      <DeleteSub
+        isOpen={deleteModalVisibleSub}
+        onClose={() => setDeleteModalVisibleSub(false)}
+        handleRefresh={handleRefresh}
+        selectedSubItem={selectedSubItem}
+        currentDatabase={currentDatabase}
       />
 
     </View>
@@ -390,7 +489,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
     marginLeft: 2,
-    color:"#E5021A"
+    color:"black"
   },
   GoBack:{
     backgroundColor: 'white',
@@ -409,19 +508,37 @@ const styles = StyleSheet.create({
   },
   itemPerPageContainer:{
     flexDirection:'row',
-    borderWidth:2,
-    backgroundColor:'#D1CDCC',
-    width:"15%",
-    marginLeft:"15%",
-    top:"20%"
+    bottom:'3%',
   },
   itemPerPageText:{
-    color:'black'
+    color:'black',
+    fontWeight:"500",
+    top:'0.3%',
+  },
+  itemPerPageText2:{
+    color:'black',
+    fontWeight:'500',
+    top:'0.4%',
   },
   adjustButton:{
-    color:'black'
-
-  }
+    color:'#F4ECEC',
+    bottom:'12%',
+    fontSize:25,
+    fontWeight:'bold',
+    marginRight:'0.3%'
+  },
+  adjustButton2:{
+    color:"#F4ECEC",
+    fontSize:25,
+    bottom:"12%",
+    fontWeight:'bold'
+  },
+  textInput:{
+    width:'3%',
+    height:'80%',
+    marginLeft:'0.3%', 
+  },
+  
 });
 
 export default SubTables;

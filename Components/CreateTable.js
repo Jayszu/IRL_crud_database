@@ -86,6 +86,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Item Name..."
+                placeholderTextColor='white'
                 value={item}
                 onChangeText={setItem}
               />
@@ -95,6 +96,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Location..."
+                placeholderTextColor='white'
                 value={location}
               onChangeText={setLocation}
               />
@@ -104,6 +106,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Description..."
+                placeholderTextColor='white'
                 value={description}
               onChangeText={setDescription}
               />
@@ -113,7 +116,8 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <TextInput
                 maxLength={6}
                 style={styles.input}
-                placeholder="Total Quantity.Please Only Put numerical value(eg.1000 not 1 thousand)"
+                placeholder="Total Quantity(e.g. 1, 200)"
+                placeholderTextColor='white'
                 value={totalQuantity}
                 onChangeText={(text) => {
                   // Remove any non-numeric characters from the input
@@ -129,6 +133,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Brand..."
+                placeholderTextColor='white'
                 value={brand}
               onChangeText={setBrand}
               />
@@ -138,6 +143,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Packing..."
+                placeholderTextColor='white'
                 value={packing}
               onChangeText={setPacking}
               />
@@ -147,6 +153,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Date Received..."
+                placeholderTextColor='white'
                 value={dateReceived}
               onChangeText={setDateReceived}
               />
@@ -156,6 +163,7 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Expiration Date..."
+                placeholderTextColor='white'
                 value={expirationDate}
               onChangeText={setExpirationDate}
               />
@@ -171,12 +179,13 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 680,
+    maxHeight: 600, // Set a maximum height
     width: 800,
-    backgroundColor: 'rgba(199, 199, 199, 0.8)',
+    backgroundColor: 'rgba(102, 102, 102, 1)',
     padding: 20,
     borderRadius: 25,
     position: 'relative',
+    overflow: 'scroll', // Allow scrolling if content exceeds max height
   },
   newRecord: {
     backgroundColor: '#32FDFE',
@@ -192,6 +201,7 @@ const styles = StyleSheet.create({
     left: 10,
     fontWeight: 'bold',
     fontSize: 20,
+    color:'white'
   },
   Desc:{
     fontWeight:'700'
@@ -199,18 +209,24 @@ const styles = StyleSheet.create({
   Fieldtext:{ 
     fontWeight:'700'
 },
-fieldscontainer:{
-    marginTop:20
+fieldscontainer: {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  justifyContent: "space-between",
+  marginTop: 20,
 },
-fieldContainer:{
-    marginBottom:10
+fieldContainer: {
+  width: "48%", // Adjust based on your preference
+  marginBottom: 10,
 },
-input:{
-    height: 40,
-    width: '100%', // Adjust the width of the text field
-    paddingHorizontal: 10,
-    borderRadius:15,
-    justifyContent:'center'
+input: {
+  height: 40,
+  width: "100%", // Adjust the width of the text field
+  paddingHorizontal: 10,
+  borderRadius: 15,
+  justifyContent: "center",
+  backgroundColor:"#1F1B1A",
+  color:'white'
 },
   closeButton: {
     position: 'absolute',

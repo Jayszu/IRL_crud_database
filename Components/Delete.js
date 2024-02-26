@@ -1,12 +1,17 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, TouchableNativeFeedback } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from 'react-native'
+import React, { useState } from 'react'
 import { Popup } from 'react-native-windows';
 import Icon from 'react-native-vector-icons/AntDesign'
 
 const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefresh}) => {
+  const [confirmation,setConfirmation] = useState('')
     if (!isOpen || !selectedItem) return null;
-
+   
     const onDelete = async () => {
+      if (confirmation !== 'CONFIRM') {
+        alert('Wrong Input. Please type "CONFIRM" to proceed with deletion. ');
+        return;
+      }
         try {
           // Fetch the record ID based on the item name
           const response = await fetch(`https://api.airtable.com/v0/appzQzVWNYXH8WNks/${currentDatabase}?filterByFormula={Id}="${selectedItem.Id}"`, {
@@ -37,7 +42,7 @@ const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefres
             'Content-Type': 'application/json'
           },
         });
-    
+        setConfirmation('');
         if (!deleteResponse.ok) {
           const errorData = await updateResponse.json();    
           const errorMessage = errorData.error.message || 'Failed to delete record';
@@ -48,6 +53,7 @@ const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefres
         handleRefresh();
         onClose();
 
+
         }
         
         catch (error) {
@@ -55,93 +61,104 @@ const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefres
             // Handle error (e.g., show error message to the user)
     }
 }
+const onCancel = () => {
+  // Reset confirmation state on cancel
+  setConfirmation('');
+  // Close the popup
+  onClose();
+};
+
 return (
-  <Popup
-    isOpen={isOpen}
-    onDismiss={onClose}
-    verticalOffset={30} 
-    
-  >
+  <Popup isOpen={isOpen} onDismiss={onClose} verticalOffset={30}>
     <View style={styles.container}>
-      <View>
       <Image style={styles.image} source={require('../Assets/warning_red.png')} />
-      <View style={styles.TextContainer}>
-      <Text style={styles.DeleteText}>
-        Delete {selectedItem.Item} from {currentDatabase} ?
-      </Text>
-      </View>
+      <Text style={styles.DeleteText}>Delete {selectedItem.Item} from {currentDatabase}?</Text>
+      <TextInput
+          style={styles.input}
+          placeholder="Type 'CONFIRM' to delete"
+          onChangeText={text => setConfirmation(text)}
+          value={confirmation}
+        />
       <View style={styles.ButtonContainer}>
-      <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>Yes, Delete it</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={onClose}style={styles.closeButton}>
-        <Text style={styles.closeButtonText}>Cancel</Text>
-      </TouchableOpacity>
-    </View></View></View>
+        <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
+          <Text style={styles.deleteButtonText}>Yes, Delete it</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onCancel} style={styles.closeButton}>
+          <Text style={styles.closeButtonText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   </Popup>
-)
-
-
-} 
+);
+};
 
 export default Delete
 
 const styles = StyleSheet.create({
-    container:{ 
-        height:350,
-        width: 450,// Adjust the width of the popup container
-        backgroundColor: 'rgba(176, 176, 176, 0.9)',
-        padding:10,
-        borderRadius: 15,
-     
-    },
-   DeleteText:{
-    fontSize:20,
-    fontWeight:'bold',  
-    bottom:'65%'
-   },
-    deleteButtonText: {
-        color: 'white',
-        fontSize: 20,
-        fontWeight: 'bold',
-      },
-      deleteButton: {
-        backgroundColor:'red',
-        borderRadius:10,
-        width:130,
-        alignItems: 'center',
-        position:'absolute',
-        left:1  
-      },
-      closeButton: {
-        position: 'absolute',
-        left:290,
-        backgroundColor:'green',
-        borderRadius:10,
-        width:130,
-        alignItems:'center'
-      },
-      closeButtonText: {
-        color: 'white',
-          fontSize: 20,
-          fontWeight: 'bold',
-      },
-      image: {
-        width: 100, // Adjust the width as needed (pixels or percentage)
-        height: 100, // Adjust the height as needed (pixels or percentage)
-        alignSelf: 'center', // Center the image horizontally within its parent container
-        marginBottom: "60%", // Add some space at the bottom if needed
-        right:'1%'
-      },
-      ButtonContainer:{
-        bottom:"35%"
-      },
-      TextContainer:{
-        height:80,
-        width:"100%",
-        bottom:'50%',
-        marginTop:5
-      }
-      
-      
-})
+  container: {
+    height: 350,
+    width: 450,
+    backgroundColor: 'rgba(102, 102, 102, 0.9)',
+    padding: 10,
+    borderRadius: 15,
+  },
+  ButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: "auto",
+  },
+  DeleteText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    width: '100%',
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 150,
+    alignItems: 'center',
+    paddingVertical: 15,
+    marginBottom: 10,
+  },
+  closeButton: {
+    backgroundColor: 'green',
+    borderRadius: 10,
+    width: 150,
+    alignItems: 'center',
+    paddingVertical: 15,
+    marginBottom: 10,
+  },
+  closeButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  image: {
+    width: 100,
+    height: 100,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    fontWeight: 'bold', // Adding bold font weight
+    textAlign: 'center', // Aligning text to start from the middle
+    width:'70%',
+    alignSelf:'center'
+
+  },
+  
+});
+    
