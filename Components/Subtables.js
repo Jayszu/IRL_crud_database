@@ -7,7 +7,7 @@ import CreateSub from './CreateSub';
 import SearchBar from './SearchBar';
 import EditSub from './EditSub';
 import DeleteSub from './DeleteSub';;
-import Airtable from 'airtable';
+import Airtable, { Table } from 'airtable';
 
 
 const SubTables = ({ route }) => {
@@ -23,8 +23,8 @@ const SubTables = ({ route }) => {
   const [currentDatabase, setCurrentDatabase] = useState(`${selectedItem.Item}`);
   const [PreviousPage,setPreviousPage]= useState()
   const [searchQuery, setSearchQuery] = useState('');
-  const [ITEMS_PER_PAGE, setItemsPerPage] = useState(10);
-  const [selectedSubItem, setselectedSubItem] =useState(null)
+  const [selectedSubItem, setselectedSubItem] =useState()
+  const [ITEMS_PER_PAGE,setItemsPerPage] =useState(10)
 
   useEffect(() => {
     fetchData();
@@ -36,7 +36,7 @@ const SubTables = ({ route }) => {
 try {
   const records = await base(currentDatabase).select({
     view: 'Grid view',
-    filterByFormula: searchQuery ? `SEARCH("${searchQuery.toLowerCase()}", LOWER({ITEM}))` : '', 
+    filterByFormula: searchQuery ? `SEARCH("${searchQuery.toLowerCase()}", LOWER({Released by}))` : '', 
     
   }).all();
 
@@ -57,26 +57,9 @@ try {
           ReleasedB: String(record.get('Released by') || ''),
           CurrB: parseInt(record.get('Current Balance') || ''),
           DateU: String(record.get('Date Updated') || ''),
-          
         }));
-        const dataWithHeader = [
-          {
-            DateR: 'Date of Release',
-            Packing: 'Packing',
-            Brand: 'Brand',
-            Location: "Location",
-            Lot: 'Lot',
-            Expiry: 'Expiry',
-            PrevB: 'Previous Balance',
-            QuanR: 'Quantity Released',
-            ReleasedB: 'Released by',
-            CurrB: 'Current Balance',
-            DateU: 'Date Updated',
-          },
-          ...newData,
-        ];
-
-        setData(dataWithHeader);
+       
+        setData(newData);
       
       } catch (err) {
         console.error(err);
@@ -223,36 +206,27 @@ try {
         </View>
     </View>
   );
+  const SubtableHeader = () => ( 
+  <View style={[styles.itemContainer]}>
+    <View style={[styles.row, styles.header]}>
+      <Text style={[styles.Hcell, styles.headerText]}>Date Released</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Location</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Packing</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Lot</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Expiry</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Previous Balance</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Quantity Released</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Released by</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Current Balance</Text>
+      <Text style={[styles.Hcell, styles.headerText]}>Date Updated</Text>
+      <View style={styles.blankcell}></View>
+    </View>
+  </View>
+);
+
+ 
 
   const renderItem = ({ item, index }) => {
-    if (index === 0) {
-      return (
-        <View style={[styles.itemContainer]}>
-          <View style={[styles.row, styles.header]}>
-            <Text style={[styles.Hcell, styles.headerText]}>Date Released</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Location</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Packing</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Lot</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Expiry</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Previous Balance</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Quantity Released</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Released by</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Current Balance</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Date Updated</Text>
-            <View style={styles.blankcell}></View>
-          </View>
-        </View>
-      );
-    }
-    // Render "No item found" text if there are no items
-    if (data.length === 0) {
-      return (
-        <View style={[styles.row, { justifyContent: 'center', paddingVertical: 10 }]}>
-          <Text style={styles.noItemText}>No item found</Text>
-        </View>
-      );
-    }
-   
       return (
         <View style={styles.row}>
           <Text style={styles.cell}>{item.DateR}</Text>
@@ -274,8 +248,8 @@ try {
             </TouchableOpacity>
           </View>
         </View>
-      );
-    };
+      )
+    }
   
   return (
     <View style={styles.container}>
@@ -297,9 +271,9 @@ try {
         setCurrentPage={setCurrentPage}
         selectedItem={selectedItem.Item}
       />
-
-<FlatList
-      data={data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
+   {SubtableHeader()}
+  <FlatList
+    data={data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)}
       renderItem={({ item, index }) => renderItem({ item, index })}
       keyExtractor={(item, index) => index.toString()}
       ListEmptyComponent={<Text>No data available</Text>}
@@ -310,33 +284,7 @@ try {
             <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
             <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
           </View>
-          <View style={styles.itemPerPageContainer}>
-            <TouchableOpacity onPress={() => {
-              if (ITEMS_PER_PAGE > 1) {
-                setItemsPerPage(ITEMS_PER_PAGE - 1);
-              }
-            }}>
-              <Text style={styles.adjustButton}>{'\u00AB   '}</Text>
-            </TouchableOpacity>
-            <Text style={styles.itemPerPageText}> Show</Text>
-            <TextInput
-              style={styles.textInput}
-              value={String(ITEMS_PER_PAGE)} // Convert to string as TextInput expects string value
-              keyboardType="numeric"
-              onChangeText={(value) => {
-                // Check if the value is empty or contains a valid number
-                if (value === '' || !isNaN(parseInt(value))) {
-                  // If the value is empty, set items per page to 0
-                  // Otherwise, update items per page with the new value
-                  setItemsPerPage(value === '' ? 0 : parseInt(value));
-                }
-              }}
-            />
-          <Text style={styles.itemPerPageText2}>  Entries</Text>
-            <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
-              <Text style={styles.adjustButton2}>{' \u00BB'}</Text>
-            </TouchableOpacity>
-          </View>
+          
         </View>
       }
       
@@ -381,14 +329,14 @@ const styles = StyleSheet.create({
     
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#CCCCCC',
-    paddingVertical: 10,
-    width: '100%', // Use percentage for width
-    paddingHorizontal: '5%', // Use percentage for horizontal padding
-    position: 'relative'
+   flexDirection: 'row',
+   justifyContent: 'space-between',
+   borderBottomWidth: 2,
+   borderBottomColor: '#CCCCCC',
+   paddingVertical: 10,
+   width: '100%', // Use percentage for width
+   paddingHorizontal: '5%', // Use percentage for horizontal padding
+   position: 'relative'
   },
   cell: {
     flex: 1,

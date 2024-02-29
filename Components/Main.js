@@ -6,8 +6,9 @@ import SearchBar from './SearchBar';
 import EditTable from './EditTable';
 import CreateTable from './CreateTable';
 import Delete from './Delete';
+import Sidebar from '../Navigation/Sidebar';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, validatePathConfig } from '@react-navigation/native';
 
 
 
@@ -26,7 +27,7 @@ const Main = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [PreviousPage,setPreviousPage]= useState()
   const [ITEMS_PER_PAGE,setItemsPerPage] =useState(10)
-  
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -60,22 +61,9 @@ const Main = () => {
         ExpirationDate: String(record.get('Expiration Date') || ''),
       }));
 
-      // Add header as the first item in the data array
-      const dataWithHeader = [
-        {
-          Item: 'Item',
-          Location: 'Location',
-          Description: 'Description',
-          TotalQty: "Total Qty",
-          Brand: 'Brand',
-          Packing: 'Packing',
-          DateReceived: 'Date Received',
-          ExpirationDate: 'Expiration Date',
-        },
-        ...newData,
-      ];
   
-      setData(dataWithHeader);
+  
+      setData(newData);
     } catch (err) {
       console.error(err);
     }
@@ -214,66 +202,24 @@ const Main = () => {
           <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage} style={styles.SearchBar}/>
         </View>
         </View>
-       <View style={styles.databaseOption}>
-        <TouchableOpacity
-          disabled={currentDatabase === 'IRL_Inventory' || !previousDatabase}
-          onPress={goBackToPreviousDatabase}
-        >
-          <Text
-            style={[
-              styles.goBackText,
-              (currentDatabase === 'IRL_Inventory' || !previousDatabase) ? styles.disabledText : null,
-            ]}
-          >
-            Inventory
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          disabled={currentDatabase === 'IRL_Chemicals'}
-          onPress={() => switchDatabase('IRL_Chemicals')}
-        >
-          <Text
-            style={[
-              styles.showOtherDatabaseText,
-              currentDatabase === 'IRL_Chemicals' ? styles.disabledText : null,
-            ]}
-          >
-            Chemicals
-          </Text>
-        </TouchableOpacity>
-       
-    </View></View>
+       </View>
+  );
+  const TableHeader = () => (
+    <View style={[styles.itemContainer]}>
+      <View style={[styles.row, styles.header]}>
+        <Text style={[styles.Hcell, styles.headerText]}>Item</Text>
+        <Text style={[styles.Hcell, styles.headerText]}>Location</Text>
+        <Text style={[styles.Hcell, styles.headerText]}>Quantity</Text>
+        <Text style={[styles.Hcell, styles.headerText]}>Brand</Text>
+        <Text style={[styles.Hcell, styles.headerText]}>Packing</Text>
+        <Text style={[styles.Hcell, styles.headerText]}>Date DateReceived</Text>
+        <Text style={[styles.Hcell, styles.headerText]}>Expiration Date</Text>
+        <View style={styles.blankcell}></View>
+      </View>
+    </View>
   );
 
    const renderItem = ({ item, index }) => {
-    // Check if it's the header row
-    if (index === 0) {
-      return (
-        <View style={[styles.itemContainer]}>
-          <View style={[styles.row, styles.header]}>
-            <Text style={[styles.Hcell, styles.headerText]}>Item</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Location</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Quantity</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Brand</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Packing</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Date DateReceived</Text>
-            <Text style={[styles.Hcell, styles.headerText]}>Expiration Date</Text>
-            <View style={styles.blankcell}></View>
-          </View>
-        </View>
-      );
-    }
-  
-    // Render "No item found" text if there are no items
-    if (data.length === 1) {
-      return (
-        <View style={[styles.row, { justifyContent: 'center', paddingVertical: 10 }]}>
-          <Text style={styles.noItemText}>No item found</Text>
-        </View>
-      );
-    }
-  
-    // Render other items in the list
     return (
       <View style={styles.row}>
         <TouchableOpacity onPress={() => handleItemClick(item)} style={[styles.cell,styles.touchableCell]}>
@@ -303,100 +249,125 @@ const Main = () => {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../Assets/logo.png')} // Specify the local path to your image
-        style={styles.image}
-      />
-      <TouchableOpacity onPress={handleopenCreate} style={styles.newRecord}>
-        <Text style={styles.NewRText}>New Record</Text>
+      {/* Sidebar */}
+      <TouchableOpacity onPress={() => setSidebarOpen(!sidebarOpen)} style={styles.hamburgerButton}>
+        <Image source={require('../Assets/menu.png')} style={styles.hamburgerIcon} />
       </TouchableOpacity>
-      {DatabaseHeader()}
-      <CreateTable 
-        currentDatabase ={currentDatabase}
-        isOpen={createModalVisible}
-        onClose={() => setCreateModalVisible(false)} 
-        handleRefresh={handleRefresh}
-        setCurrentPage={setCurrentPage}
-        
-      />
-          <FlatList
-      data={data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
-      renderItem={({ item, index }) => renderItem({ item, index })}
-      keyExtractor={(item, index) => index.toString()}
-      ListEmptyComponent={<Text>No data available</Text>}
-      ListFooterComponent={
-        <View>
-          <View style={styles.paginationContainer}>
-            <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
-            <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
-            <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
-          </View>
-          <View style={styles.itemPerPageContainer}>
-            <TouchableOpacity onPress={() => {
-              if (ITEMS_PER_PAGE > 1) {
-                setItemsPerPage(ITEMS_PER_PAGE - 1);
-              }
-            }}>
-              <Text style={styles.adjustButton}>{'\u00AB   '}</Text>
-            </TouchableOpacity>
-            <Text style={styles.itemPerPageText}> Show</Text>
-            <TextInput
-              style={styles.textInput}
-              value={String(ITEMS_PER_PAGE)} // Convert to string as TextInput expects string value
-              keyboardType="numeric"
-              onChangeText={(value) => {
-                // Check if the value is empty or contains a valid number
-                if (value === '' || !isNaN(parseInt(value))) {
-                  // If the value is empty, set items per page to 0
-                  // Otherwise, update items per page with the new value
-                  setItemsPerPage(value === '' ? 0 : parseInt(value));
-                }
-              }}
-            />
-          <Text style={styles.itemPerPageText2}>  Entries</Text>
-            <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
-              <Text style={styles.adjustButton2}>{' \u00BB'}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      }
-      
-    />
-      <EditTable
-        isOpen={editModalVisible}
-        onClose={() => setEditModalVisible(false)}
-        handleBackspace={handleBackspace}
-        selectedItem={selectedItem}
-        handleItemChange={handleItemChange}
-        handleLocationChange={handleLocationChange}
-        handleDescriptionChange={handleDescriptionChange}
-        handleTotalQtyChange={handleTotalQtyChange}
-        handleBrandChange={handleBrandChange}
-        handlePackingChange={handlePackingChange}
-        handleDateRChange={handleDateRChange}
-        handleExpDChange={handleExpDChange}
-        handleRefresh={handleRefresh}
-        currentDatabase={currentDatabase}
-      />
-      <Delete
-        isOpen={deleteModalVisible}
-        onClose={() => setDeleteModalVisible(false)}
-        selectedItem={selectedItem}
-        currentDatabase={currentDatabase}
-        handleRefresh={handleRefresh}
-      />
+      {sidebarOpen && <Sidebar switchDatabase={switchDatabase} currentDatabase={currentDatabase} />}
+  
+      {/* Content */}
+      <View style={styles.contentContainer}>
+        <Image
+          source={require('../Assets/logo.png')} // Specify the local path to your image
+          style={styles.image}
+        />
+        <TouchableOpacity onPress={handleopenCreate} style={styles.newRecord}>
+          <Text style={styles.NewRText}>New Record</Text>
+        </TouchableOpacity>
+        {DatabaseHeader()}
+        <CreateTable 
+          currentDatabase ={currentDatabase}
+          isOpen={createModalVisible}
+          onClose={() => setCreateModalVisible(false)} 
+          handleRefresh={handleRefresh}
+          setCurrentPage={setCurrentPage}
+        />
+        {TableHeader()}
+        <FlatList
+          data={data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
+          renderItem={({ item, index }) => renderItem({ item, index })}
+          keyExtractor={(item, index) => index.toString()}
+          ListEmptyComponent={<Text>No data available</Text>}
+          ListFooterComponent={
+            <View>
+              <View style={styles.paginationContainer}>
+                <Button onPress={goToPreviousPage} title="Previous" disabled={currentPage === 1} />
+                <Text style={styles.paginationText}>{currentPage}/{totalPages}</Text>
+                <Button onPress={goToNextPage} title="Next" disabled={currentPage === totalPages} />
+              </View>
+              <View style={styles.itemPerPageContainer}>
+                <TouchableOpacity onPress={() => {
+                  if (ITEMS_PER_PAGE > 1) {
+                    setItemsPerPage(ITEMS_PER_PAGE - 1);
+                  }
+                }}>
+                  <Text style={styles.adjustButton}>{'\u00AB   '}</Text>
+                </TouchableOpacity>
+                <Text style={styles.itemPerPageText}> Show</Text>
+                <TextInput
+                  style={styles.textInput}
+                  value={String(ITEMS_PER_PAGE)} // Convert to string as TextInput expects string value
+                  keyboardType="numeric"
+                  onChangeText={(value) => {
+                    // Check if the value is empty or contains a valid number
+                    if (value === '' || !isNaN(parseInt(value))) {
+                      // If the value is empty, set items per page to 0
+                      // Otherwise, update items per page with the new value
+                      setItemsPerPage(value === '' ? 0 : parseInt(value));
+                    }
+                  }}
+                />
+                <Text style={styles.itemPerPageText2}>  Entries</Text>
+                <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
+                  <Text style={styles.adjustButton2}>{' \u00BB'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          }
+        />
+        <EditTable
+          isOpen={editModalVisible}
+          onClose={() => setEditModalVisible(false)}
+          handleBackspace={handleBackspace}
+          selectedItem={selectedItem}
+          handleItemChange={handleItemChange}
+          handleLocationChange={handleLocationChange}
+          handleDescriptionChange={handleDescriptionChange}
+          handleTotalQtyChange={handleTotalQtyChange}
+          handleBrandChange={handleBrandChange}
+          handlePackingChange={handlePackingChange}
+          handleDateRChange={handleDateRChange}
+          handleExpDChange={handleExpDChange}
+          handleRefresh={handleRefresh}
+          currentDatabase={currentDatabase}
+        />
+        <Delete
+          isOpen={deleteModalVisible}
+          onClose={() => setDeleteModalVisible(false)}
+          selectedItem={selectedItem}
+          currentDatabase={currentDatabase}
+          handleRefresh={handleRefresh}
+        />
+      </View>
     </View>
   );
-};
-
+        };  
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#439176',
-      alignItems: 'stretch',
-      justifyContent: 'flex-start',
-      paddingHorizontal: '5%', // Use percentage for padding
-    },
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  sidebarContainer: {
+    position: 'relative', // Ensure absolute positioning is relative to this container
+
+  },
+  contentContainer: {
+    flex: 1,
+    backgroundColor: '#439176',
+    alignItems: 'stretch',
+    justifyContent: 'flex-start',
+    paddingHorizontal: '5%',
+  },
+  hamburgerButton: {
+    position: 'absolute', // Position the hamburger button absolutely within the sidebar container
+    top: 20, // Adjust as needed
+    left: 20, // Adjust as needed
+    zIndex: 1, // Ensure the button is above other content
+  },
+  hamburgerIcon: {
+    width: 24, // Adjust size as needed
+    height: 24, // Adjust size as needed
+  },
     SearchBarContainer: {
       bottom:'15%',
       justifyContent:'flex-end',
@@ -430,7 +401,7 @@ const styles = StyleSheet.create({
     row: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      borderBottomWidth: 1,
+      borderBottomWidth: 2,
       borderBottomColor: '#CCCCCC',
       paddingVertical: 10,
       width: '100%', // Use percentage for width
@@ -517,7 +488,7 @@ const styles = StyleSheet.create({
     blankcell: {
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: '5%', // Use percentage for margin
+      marginRight: '8%', // Use percentage for margin
     },
     newRecord: {
       backgroundColor: '#32FDFE',
@@ -588,7 +559,17 @@ const styles = StyleSheet.create({
       height:'80%',
       marginLeft:'0.3%',
       
-    }
+    },
+    hamburgerButton: {
+      position: 'absolute',
+      top: 20,
+      left: 20,
+      zIndex: 1, // Ensure the button is above other components
+    },
+    hamburgerIcon: {
+      width: 30,
+      height: 30,
+    },
   });
   
 
