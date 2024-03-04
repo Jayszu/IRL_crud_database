@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View,TextInput, Text, StyleSheet, TouchableOpacity, FlatList, Button, Image} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AnimatedText from './AnimatedText';
-import TitleHeader from './TitleHeader';
+
 import CreateSub from './CreateSub';
 import SearchBar from './SearchBar';
 import EditSub from './EditSub';
@@ -11,7 +11,7 @@ import Airtable, { Table } from 'airtable';
 
 
 const SubTables = ({ route }) => {
-  const { selectedItem, setSelectedItem } = route.params;
+  const { selectedItem, setSelectedItem, Name, role, Profile } = route.params;
 
   const navigation = useNavigation();
   const [data, setData] = useState([]);
@@ -130,7 +130,7 @@ try {
 
   const handlegoBack =() =>{
     console.log('gone back')
-    navigation.navigate('Main');
+    navigation.navigate('Main', {Name, role, Profile });
     
   };
   const handleDateRChange = (text) => {

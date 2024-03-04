@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, Image, TextInput } from 'react-native';
 import Airtable from 'airtable';
-import TitleHeader from './TitleHeader';
 import SearchBar from './SearchBar';
 import EditTable from './EditTable';
 import CreateTable from './CreateTable';
 import Delete from './Delete';
 import Sidebar from '../Navigation/Sidebar';
+import { useNavigation } from '@react-navigation/native';
+import Footer from './footer';
+import { useRoute } from '@react-navigation/native';
 
-import { useNavigation, validatePathConfig } from '@react-navigation/native';
 
 
 
@@ -28,22 +29,26 @@ const Main = () => {
   const [PreviousPage,setPreviousPage]= useState()
   const [ITEMS_PER_PAGE,setItemsPerPage] =useState(10)
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState('ASC')
+  const route = useRoute();
+  const { Name, role, Profile} = route.params;
 
   useEffect(() => {
     fetchData();
-  }, [currentPage, currentDatabase, searchQuery]); // Fetch data whenever currentPage, currentDatabase, or searchQuery changes
+  }, [currentPage, currentDatabase, searchQuery, sortOrder]); // Fetch data whenever currentPage, currentDatabase, or searchQuery changes
 
   const fetchData = async () => {
     const base = new Airtable({ apiKey: 'patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3' })
       .base('appzQzVWNYXH8WNks');
-  
+  console.log(Name)
     try {
       const records = await base(currentDatabase).select({
         view: 'Grid view',
         filterByFormula: searchQuery ? `SEARCH("${searchQuery.toLowerCase()}", LOWER({ITEM}))` : '', 
+        sort: [{ field: 'Item', direction: sortOrder === 'ASC' ? 'asc' : 'desc' }]
         
       }).all();
-  
+     
       // Calculate total pages based on the total number of records
       const totalRecordsCount = records.length;
       setTotalPages(Math.ceil(totalRecordsCount / ITEMS_PER_PAGE));
@@ -164,7 +169,7 @@ const Main = () => {
   const handleItemClick = (selectedItem) => {
     
     // Navigate to the desired screen here
-    navigation.navigate('Subtables', { selectedItem },);
+    navigation.navigate('Subtables', { selectedItem, Name, role, Profile },);
 
   };
   
@@ -194,12 +199,17 @@ const Main = () => {
     fetchData();
     
   };
+  const handleSortChange = () => {
+    const newSortOrder = sortOrder === 'ASC' ? 'DESC' : 'ASC';
+    setSortOrder(newSortOrder);
+  };
   
   const DatabaseHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.headerOptions}>
         <View style={styles.SearchBarContainer}>
           <SearchBar onSearch={handleSearch} setCurrentPage={setCurrentPage} style={styles.SearchBar}/>
+         
         </View>
         </View>
        </View>
@@ -212,9 +222,15 @@ const Main = () => {
         <Text style={[styles.Hcell, styles.headerText]}>Quantity</Text>
         <Text style={[styles.Hcell, styles.headerText]}>Brand</Text>
         <Text style={[styles.Hcell, styles.headerText]}>Packing</Text>
-        <Text style={[styles.Hcell, styles.headerText]}>Date DateReceived</Text>
+        <Text style={[styles.Hcell, styles.headerText]}>Date Received</Text>
         <Text style={[styles.Hcell, styles.headerText]}>Expiration Date</Text>
-        <View style={styles.blankcell}></View>
+        <TouchableOpacity onPress={handleSortChange} >
+            <View style={styles.blankcell}>
+            <Image source={require('../Assets/a-z.png')} style={styles.SortIcon} />
+          </View>
+          </TouchableOpacity>
+   
+     
       </View>
     </View>
   );
@@ -253,7 +269,7 @@ const Main = () => {
       <TouchableOpacity onPress={() => setSidebarOpen(!sidebarOpen)} style={styles.hamburgerButton}>
         <Image source={require('../Assets/menu.png')} style={styles.hamburgerIcon} />
       </TouchableOpacity>
-      {sidebarOpen && <Sidebar switchDatabase={switchDatabase} currentDatabase={currentDatabase} />}
+      {sidebarOpen && <Sidebar switchDatabase={switchDatabase} currentDatabase={currentDatabase} Name={Name} role={role} Profile={Profile}/>}
   
       {/* Content */}
       <View style={styles.contentContainer}>
@@ -273,6 +289,7 @@ const Main = () => {
           setCurrentPage={setCurrentPage}
         />
         {TableHeader()}
+       
         <FlatList
           data={data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE + 1)}
           renderItem={({ item, index }) => renderItem({ item, index })}
@@ -311,10 +328,14 @@ const Main = () => {
                 <TouchableOpacity onPress={() => setItemsPerPage(ITEMS_PER_PAGE + 1)}>
                   <Text style={styles.adjustButton2}>{' \u00BB'}</Text>
                 </TouchableOpacity>
-              </View>
+             
+              </View>    
             </View>
+           
           }
+          
         />
+         <Footer />
         <EditTable
           isOpen={editModalVisible}
           onClose={() => setEditModalVisible(false)}
@@ -340,7 +361,9 @@ const Main = () => {
         />
       </View>
     </View>
+    
   );
+  
         };  
 const styles = StyleSheet.create({
   container: {
@@ -471,7 +494,7 @@ const styles = StyleSheet.create({
     },
     editIcon: {
       padding: 5,
-      backgroundColor: '#E8AC13',
+      backgroundColor: '#f59328',
       borderRadius: 3,
     },
     deleteIcon: {
@@ -488,10 +511,10 @@ const styles = StyleSheet.create({
     blankcell: {
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: '8%', // Use percentage for margin
+      marginRight: '6%', // Use percentage for margin
     },
     newRecord: {
-      backgroundColor: '#32FDFE',
+      backgroundColor: '#3488ea',
       width: '7%', // Use percentage for width
       top: 55,
       left: '5%', // Use percentage for left position
@@ -570,6 +593,11 @@ const styles = StyleSheet.create({
       width: 30,
       height: 30,
     },
+    SortIcon:{
+      tintColor:'white',
+      width: 30,
+      height: 30,
+    }
   });
   
 
