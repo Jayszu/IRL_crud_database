@@ -27,10 +27,12 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
 
   const handleCreateRecord = async () => {
     try {
+      const totalQtyValue = totalQuantity !== '' ? parseInt(totalQuantity) : null;
+      
       const fields = {
         Item: item,
         Location: location,
-        'Total Qty': totalQuantity,
+        'Total Qty': totalQtyValue !== null ? totalQtyValue : 0,
         Brand: brand,
         Packing: packing,
         'Date Received': dateReceived,
@@ -118,14 +120,14 @@ const CreateTable = ({ isOpen, onClose, currentDatabase,handleRefresh }) => {
                 style={styles.input}
                 placeholder="Total Quantity(e.g. 1, 200)"
                 placeholderTextColor='white'
-                value={totalQuantity}
+                value={totalQuantity !== null ? totalQuantity.toString() : ''}
                 onChangeText={(text) => {
-                  // Remove any non-numeric characters from the input
-                  const numericValue = text.replace(/[^0-9]/g, '');
-                  // Update the state with the cleaned numeric value
-                  setTotalQuantity(parseInt(numericValue));
+                    // Remove any non-numeric characters from the input
+                    const numericValue = text.replace(/[^0-9]/g, '');
+                    // Update the state with the cleaned numeric value
+                    setTotalQuantity(numericValue !== '' ? parseInt(numericValue) : null);
                 }}
-              />
+            />
            
               </View>
               <View style={styles.fieldContainer}>

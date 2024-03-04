@@ -11,9 +11,6 @@ import Footer from './footer';
 import { useRoute } from '@react-navigation/native';
 
 
-
-
-
 const Main = () => {
   const navigation = useNavigation();
   const [data, setData] = useState([]);
@@ -40,7 +37,7 @@ const Main = () => {
   const fetchData = async () => {
     const base = new Airtable({ apiKey: 'patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3' })
       .base('appzQzVWNYXH8WNks');
-  console.log(Name)
+ 
     try {
       const records = await base(currentDatabase).select({
         view: 'Grid view',
@@ -66,8 +63,6 @@ const Main = () => {
         ExpirationDate: String(record.get('Expiration Date') || ''),
       }));
 
-  
-  
       setData(newData);
     } catch (err) {
       console.error(err);
@@ -248,14 +243,21 @@ const Main = () => {
         <Text style={styles.cell}>{item.DateReceived}</Text>
         <Text style={styles.cell}>{item.ExpirationDate}</Text>
         <View style={styles.editCell}>
-          <TouchableOpacity onPress={() => handleEditItem(item)} style={styles.editIcon}>
-            <Text style={{color:'white',fontWeight:'700'}}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDeleteItem(item)} style={styles.deleteIcon}>
-            <Text style={{color:'white',fontWeight:'700'}}>Delete</Text>
-          </TouchableOpacity>
-
-        </View>
+        <TouchableOpacity
+          onPress={role !== 'Viewer' ? () => handleEditItem(item) : null}
+          style={[styles.editIcon, role === 'Viewer' && { opacity: 0.5 }]}
+          pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+        >
+          <Text style={{color:'white',fontWeight:'700'}}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={role !== 'Viewer' ? () => handleDeleteItem(item) : null}
+          style={[styles.deleteIcon, role === 'Viewer' && { opacity: 0.5 }]}
+          pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+        >
+          <Text style={{color:'white',fontWeight:'700'}}>Delete</Text>
+        </TouchableOpacity>
+      </View>
       </View>
     );
   };
@@ -265,19 +267,23 @@ const Main = () => {
 
   return (
     <View style={styles.container}>
-      {/* Sidebar */}
+    
       <TouchableOpacity onPress={() => setSidebarOpen(!sidebarOpen)} style={styles.hamburgerButton}>
-        <Image source={require('../Assets/menu.png')} style={styles.hamburgerIcon} />
+        <Image source={sidebarOpen ? require('../Assets/backIcon.png') : require('../Assets/menu.png')} style={styles.hamburgerIcon} />
       </TouchableOpacity>
       {sidebarOpen && <Sidebar switchDatabase={switchDatabase} currentDatabase={currentDatabase} Name={Name} role={role} Profile={Profile}/>}
   
-      {/* Content */}
+    
       <View style={styles.contentContainer}>
         <Image
           source={require('../Assets/logo.png')} // Specify the local path to your image
           style={styles.image}
         />
-        <TouchableOpacity onPress={handleopenCreate} style={styles.newRecord}>
+        <TouchableOpacity
+          onPress={role !== 'Viewer' ? () => handleopenCreate() : null} 
+          style={[styles.newRecord, role === 'Viewer' && { opacity: 0.5 }]}
+          pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+        >
           <Text style={styles.NewRText}>New Record</Text>
         </TouchableOpacity>
         {DatabaseHeader()}
@@ -371,7 +377,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   sidebarContainer: {
-    position: 'relative', // Ensure absolute positioning is relative to this container
+    position: 'relative',
 
   },
   contentContainer: {
@@ -382,19 +388,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: '5%',
   },
   hamburgerButton: {
-    position: 'absolute', // Position the hamburger button absolutely within the sidebar container
-    top: 20, // Adjust as needed
-    left: 20, // Adjust as needed
-    zIndex: 1, // Ensure the button is above other content
+    position: 'absolute', 
+    top: 20, 
+    left: 20, 
+    zIndex: 1, 
   },
   hamburgerIcon: {
-    width: 24, // Adjust size as needed
-    height: 24, // Adjust size as needed
+    width: 24, 
+    height: 24, 
   },
     SearchBarContainer: {
       bottom:'15%',
       justifyContent:'flex-end',
-      alignItems: 'flex-end', // Center items vertically
+      alignItems: 'flex-end', 
       flexDirection:'row',
      flex:1,
    
@@ -427,8 +433,8 @@ const styles = StyleSheet.create({
       borderBottomWidth: 2,
       borderBottomColor: '#CCCCCC',
       paddingVertical: 10,
-      width: '100%', // Use percentage for width
-      paddingHorizontal: '5%', // Use percentage for horizontal padding
+      width: '100%', 
+      paddingHorizontal: '5%',
       position: 'relative'
     },
     cell: {
@@ -458,7 +464,7 @@ const styles = StyleSheet.create({
     headerOptions: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginRight: '5%', // Use percentage for margin
+      marginRight: '5%',
       bottom:'-20%'
     },
     showOtherDatabaseText: {
@@ -484,8 +490,8 @@ const styles = StyleSheet.create({
       color: '#F2ECEC',
     },
     SearchBar: {
-      // flex: 1, // No need for flex here
-      width: '30%', // Adjust width as needed
+     
+      width: '30%', 
       height: 60,
       bottom: 10,
     },
@@ -511,13 +517,13 @@ const styles = StyleSheet.create({
     blankcell: {
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: '6%', // Use percentage for margin
+      marginRight: '6%', 
     },
     newRecord: {
       backgroundColor: '#3488ea',
-      width: '7%', // Use percentage for width
+      width: '7%', 
       top: 55,
-      left: '5%', // Use percentage for left position
+      left: '5%', 
       height: 30,
       justifyContent: 'center',
       borderRadius: 5
@@ -530,7 +536,7 @@ const styles = StyleSheet.create({
     image: {
       position: 'absolute',
       top: 0,
-      left: '50%', // Use percentage for left position
+      left: '50%',
       width: 100,
       height: 100,
       resizeMode: 'cover',
@@ -587,7 +593,7 @@ const styles = StyleSheet.create({
       position: 'absolute',
       top: 20,
       left: 20,
-      zIndex: 1, // Ensure the button is above other components
+      zIndex: 1, 
     },
     hamburgerIcon: {
       width: 30,

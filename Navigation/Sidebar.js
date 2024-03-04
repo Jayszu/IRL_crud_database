@@ -18,6 +18,11 @@ const Sidebar = ({ switchDatabase, currentDatabase,Name, role, Profile}) => {
       console.error('Error clearing authentication token:', error);
     }
   };
+  const UserstablePressed =  () =>{
+    navigation.navigate('AdminTable',{Name,role,Profile})
+  
+  };
+
   
 
   return (
@@ -49,6 +54,17 @@ const Sidebar = ({ switchDatabase, currentDatabase,Name, role, Profile}) => {
         >
           <Text style={styles.databaseOptionText}>Chemicals</Text>
         </TouchableOpacity>
+        {role === 'Admin' && (
+            <TouchableOpacity 
+            onPress={UserstablePressed}
+              style={[
+                styles.databaseOption,
+                
+              ]}
+            >
+              <Text style={styles.databaseOptionText}>Users Table</Text>
+            </TouchableOpacity>
+          )}
       </View>
 
       <TouchableOpacity onPress={LogoutPressed}>
@@ -73,14 +89,14 @@ const styles = StyleSheet.create({
   },
   optionsContainer: {
     alignSelf: 'flex-start',
-    bottom:"75%",
+    bottom:"70%",
   },
   databaseOption: {
-    marginBottom: 10,
+  
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
-    top:'300%'
+    top:'250%'
   },
   databaseOptionText: {
     color: 'white',
@@ -109,18 +125,18 @@ const styles = StyleSheet.create({
     alignSelf:'center'
   },
   ProfileTexts:{
- bottom:"50%"
+   bottom:"50%"
   },
   Role:{
     color:"white",
     alignSelf:'center'
   },
   Profile:{
-   
       width: 150,
       height: 150,
       borderRadius: 100, 
-      marginBottom: 10, 
+      alignSelf:"center"
+     
   }
 });
 

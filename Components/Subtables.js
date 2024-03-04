@@ -240,13 +240,21 @@ try {
           <Text style={styles.cell}>{item.CurrB}</Text>
           <Text style={styles.cell}>{item.DateU}</Text>
           <View style={styles.editCell}>
-            <TouchableOpacity onPress={() => handleEditItem(item)} style={styles.editIcon}>
-              <Text style={{ color: 'white', fontWeight: '700' }}>Edit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => handleDeleteItem(item)} style={styles.deleteIcon}>
-              <Text style={{ color: 'white', fontWeight: '700' }}>Delete</Text>
-            </TouchableOpacity>
-          </View>
+        <TouchableOpacity
+          onPress={role !== 'Viewer' ? () => handleEditItem(item) : null}
+          style={[styles.editIcon, role === 'Viewer' && { opacity: 0.5 }]}
+          pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+        >
+          <Text style={{color:'white',fontWeight:'700'}}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={role !== 'Viewer' ? () => handleDeleteItem(item) : null}
+          style={[styles.deleteIcon, role === 'Viewer' && { opacity: 0.5 }]}
+          pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+        >
+          <Text style={{color:'white',fontWeight:'700'}}>Delete</Text>
+        </TouchableOpacity>
+      </View>
         </View>
       )
     }
@@ -260,7 +268,11 @@ try {
       <TouchableOpacity onPress={handlegoBack} style={styles.GoBack}>
       <Text style={styles.goBackText}>Go Back</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleopenCreate} style={styles.newRecord}>
+      <TouchableOpacity
+        onPress={role !== 'Viewer' ? () => handleopenCreate() : null} 
+        style={[styles.newRecord, role === 'Viewer' && { opacity: 0.5 }]}
+        pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+      >
         <Text style={styles.NewRText}>New Record</Text>
       </TouchableOpacity>
       {DatabaseHeader()}
@@ -364,7 +376,7 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   newRecord: {
-    backgroundColor: '#32FDFE',
+    backgroundColor: '#3488ea',
     width: '7%', // Use percentage for width
     top: 55,
     left: '5%', // Use percentage for left position
