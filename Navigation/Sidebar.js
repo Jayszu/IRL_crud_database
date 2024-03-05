@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native'; // Import useNavigatio
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const Sidebar = ({ switchDatabase, currentDatabase,Name, role, Profile}) => {
+const Sidebar = ({ switchDatabase, currentDatabase,Name, Role, Profile}) => {
   const navigation = useNavigation(); // Access the navigation object
 
   const LogoutPressed = async () => {
@@ -18,10 +18,7 @@ const Sidebar = ({ switchDatabase, currentDatabase,Name, role, Profile}) => {
       console.error('Error clearing authentication token:', error);
     }
   };
-  const UserstablePressed =  () =>{
-    navigation.navigate('AdminTable',{Name,role,Profile})
-  
-  };
+
 
   
 
@@ -33,7 +30,7 @@ const Sidebar = ({ switchDatabase, currentDatabase,Name, role, Profile}) => {
         style={styles.Profile}
       />
       <Text style={styles.Name}>{Name}</Text>
-      <Text style={styles.Role}>{role}</Text>
+      <Text style={styles.Role}>{Role}</Text>
       </View>
       <View style={styles.optionsContainer}>
         <TouchableOpacity
@@ -41,7 +38,7 @@ const Sidebar = ({ switchDatabase, currentDatabase,Name, role, Profile}) => {
             styles.databaseOption,
             currentDatabase === 'IRL_Lab_Supplies' ? styles.activeDatabase : null,
           ]}
-          onPress={() => switchDatabase('IRL_Lab_Supplies')}
+          onPress={() => navigation.navigate('Main',{Name,Role,Profile})}
         >
           <Text style={styles.databaseOptionText}>Lab Supplies</Text>
         </TouchableOpacity>
@@ -50,20 +47,20 @@ const Sidebar = ({ switchDatabase, currentDatabase,Name, role, Profile}) => {
             styles.databaseOption,
             currentDatabase === 'IRL_Chemicals' ? styles.activeDatabase : null,
           ]}
-          onPress={() => switchDatabase('IRL_Chemicals')}
+          onPress={() => navigation.navigate('Chemicals',{Name,Role,Profile})}
         >
           <Text style={styles.databaseOptionText}>Chemicals</Text>
         </TouchableOpacity>
-        {role === 'Admin' && (
-            <TouchableOpacity 
-            onPress={UserstablePressed}
-              style={[
-                styles.databaseOption,
-                
-              ]}
-            >
-              <Text style={styles.databaseOptionText}>Users Table</Text>
-            </TouchableOpacity>
+        {Role === 'Admin' && (
+            <TouchableOpacity
+            style={[
+              styles.databaseOption,
+              currentDatabase === 'Records' ? styles.activeDatabase : null,
+            ]}
+            onPress={() => navigation.navigate('AdminTable',{Name,Role,Profile})}
+          >
+            <Text style={styles.databaseOptionText}>Users Management</Text>
+          </TouchableOpacity>
           )}
       </View>
 

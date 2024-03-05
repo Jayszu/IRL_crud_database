@@ -11,7 +11,7 @@ import Airtable, { Table } from 'airtable';
 
 
 const SubTables = ({ route }) => {
-  const { selectedItem, setSelectedItem, Name, role, Profile } = route.params;
+  const { selectedItem, setSelectedItem, Name, Role, Profile } = route.params;
 
   const navigation = useNavigation();
   const [data, setData] = useState([]);
@@ -130,7 +130,7 @@ try {
 
   const handlegoBack =() =>{
     console.log('gone back')
-    navigation.navigate('Main', {Name, role, Profile });
+    navigation.navigate('Main', {Name, Role, Profile });
     
   };
   const handleDateRChange = (text) => {
@@ -241,16 +241,16 @@ try {
           <Text style={styles.cell}>{item.DateU}</Text>
           <View style={styles.editCell}>
         <TouchableOpacity
-          onPress={role !== 'Viewer' ? () => handleEditItem(item) : null}
-          style={[styles.editIcon, role === 'Viewer' && { opacity: 0.5 }]}
-          pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+          onPress={Role !== 'Viewer' ? () => handleEditItem(item) : null}
+          style={[styles.editIcon, Role === 'Viewer' && { opacity: 0.5 }]}
+          pointerEvents={Role === 'Viewer' ? 'none' : 'auto'}
         >
           <Text style={{color:'white',fontWeight:'700'}}>Edit</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={role !== 'Viewer' ? () => handleDeleteItem(item) : null}
-          style={[styles.deleteIcon, role === 'Viewer' && { opacity: 0.5 }]}
-          pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+          onPress={Role !== 'Viewer' ? () => handleDeleteItem(item) : null}
+          style={[styles.deleteIcon, Role === 'Viewer' && { opacity: 0.5 }]}
+          pointerEvents={Role === 'Viewer' ? 'none' : 'auto'}
         >
           <Text style={{color:'white',fontWeight:'700'}}>Delete</Text>
         </TouchableOpacity>
@@ -269,9 +269,9 @@ try {
       <Text style={styles.goBackText}>Go Back</Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={role !== 'Viewer' ? () => handleopenCreate() : null} 
-        style={[styles.newRecord, role === 'Viewer' && { opacity: 0.5 }]}
-        pointerEvents={role === 'Viewer' ? 'none' : 'auto'}
+        onPress={Role !== 'Viewer' ? () => handleopenCreate() : null} 
+        style={[styles.newRecord, Role === 'Viewer' && { opacity: 0.5 }]}
+        pointerEvents={Role === 'Viewer' ? 'none' : 'auto'}
       >
         <Text style={styles.NewRText}>New Record</Text>
       </TouchableOpacity>

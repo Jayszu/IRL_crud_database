@@ -5,8 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Airtable from 'airtable';
 
 const LoginScreen = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [Username, setUsername] = useState('');
+  const [Password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // State variable to track loading
 
   const navigation = useNavigation();
@@ -18,16 +18,16 @@ const LoginScreen = () => {
       const base = new Airtable({ apiKey: 'patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3' })
       .base('appjSsMo3NZ8iJPHL');
       const userRecords = await base(currentDatabase).select({ view: 'Grid view' }).all();
-      const lowercaseUsername = username.toLowerCase();
+      const lowercaseUsername = Username.toLowerCase();
 
-      const matchingUser = userRecords.find(record => record.fields.username.toLowerCase() === lowercaseUsername && record.fields.password === password);
+      const matchingUser = userRecords.find(record => record.fields.Username.toLowerCase() === lowercaseUsername && record.fields.Password === Password);
       const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
       
       if (matchingUser || isLoggedIn === 'true') {
         await AsyncStorage.setItem('isLoggedIn', 'true');
         navigation.navigate('Main', { 
           Name: matchingUser.fields.Name,
-          role: matchingUser.fields.role,
+          Role: matchingUser.fields.Role,
           Profile: matchingUser.fields.Profile[0].url
         });
       } else {
@@ -47,7 +47,7 @@ const LoginScreen = () => {
       <TextInput
         style={styles.input}
         placeholder="Username"
-        value={username}
+        value={Username}
         onChangeText={(text) => setUsername(text)}
         onSubmitEditing={() => { passwordInput.focus(); }}
       />
@@ -56,7 +56,7 @@ const LoginScreen = () => {
         style={styles.input}
         placeholder="Password"
         secureTextEntry={true}
-        value={password}
+        value={Password}
         onChangeText={(text) => setPassword(text)}
         onSubmitEditing={handleLogin} 
       />

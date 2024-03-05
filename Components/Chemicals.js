@@ -13,12 +13,12 @@ import { useRoute } from '@react-navigation/native';
 
 
 
-const Main = () => {
+const Chemicals = () => {
   const navigation = useNavigation();
   const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState();
-  const [currentDatabase, setCurrentDatabase] = useState('IRL_Lab_Supplies'); // Default database
+  const [currentDatabase, setCurrentDatabase] = useState('IRL_Chemicals'); // Default database
   const [previousDatabase, setPreviousDatabase] = useState(''); // Previous database
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedItem, setSelectedItem] = useState(null); // Selected item data
@@ -38,7 +38,7 @@ const Main = () => {
 
   const fetchData = async () => {
     const base = new Airtable({ apiKey: 'patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3' })
-      .base('appzQzVWNYXH8WNks');
+      .base('appNRC5vSBgrKCqii');
  
     try {
       const records = await base(currentDatabase).select({
@@ -57,7 +57,6 @@ const Main = () => {
         Id: String(record.get('Id')),
         Item: String(record.get('Item') || ''),
         Location: String(record.get('Location') || ''),
-        Description: String(record.get('Description') || ''),
         TotalQty: parseInt(record.get('Total Qty')), // Parses the value to a floating-point number
         Brand: String(record.get('Brand') || ''),
         Packing: String(record.get('Packing') || ''),
@@ -149,9 +148,7 @@ const Main = () => {
     setSelectedItem(prevItem => ({ ...prevItem, Location: text }));
   };
 
-  const handleDescriptionChange = (text) => {
-    setSelectedItem(prevItem => ({ ...prevItem, Description: text }));
-  };
+
 
   const handleTotalQtyChange = (text) => {
     // Allow backspace or if the input is a valid number
@@ -358,7 +355,7 @@ const Main = () => {
           selectedItem={selectedItem}
           handleItemChange={handleItemChange}
           handleLocationChange={handleLocationChange}
-          handleDescriptionChange={handleDescriptionChange}
+          
           handleTotalQtyChange={handleTotalQtyChange}
           handleBrandChange={handleBrandChange}
           handlePackingChange={handlePackingChange}
@@ -402,7 +399,7 @@ const styles = StyleSheet.create({
     left: 20, 
     zIndex: 1, 
   },
- 
+  
     SearchBarContainer: {
       bottom:'15%',
       justifyContent:'flex-end',
@@ -609,4 +606,4 @@ const styles = StyleSheet.create({
   
 
 
-export default Main;
+export default Chemicals;

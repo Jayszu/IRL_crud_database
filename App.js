@@ -6,6 +6,7 @@ import Main from './Components/Main'
 import { createStackNavigator } from '@react-navigation/stack';
 import LoginScreen from './Auth/LoginScreen';
 import AdminTable from './Components/AdminTable';
+import Chemicals from './Components/Chemicals';
 
 const Stack = createStackNavigator();
 const App = () => { 
@@ -16,6 +17,7 @@ const App = () => {
       <Stack.Screen name="Subtables" component={Subtables} />
       <Stack.Screen name="LoginScreen" component={LoginScreen} />
       <Stack.Screen name="AdminTable" component={AdminTable} />
+      <Stack.Screen name="Chemicals" component={Chemicals} />
     </Stack.Navigator>
    </NavigationContainer>
   );
