@@ -506,18 +506,20 @@ const styles = StyleSheet.create({
     },
     editIcon: {
       padding: 5,
-      backgroundColor: '#f59328',
+      backgroundColor: '#E8AC13',
       borderRadius: 3,
+      marginLeft: 10, // Add some spacing between the edit and delete buttons
     },
     deleteIcon: {
       padding: 5,
       backgroundColor: '#BA0505',
-      borderRadius: 3
+      borderRadius: 3,
+      marginLeft: 10, // Add some spacing between the edit and delete buttons
     },
     editCell: {
       justifyContent: 'center',
       alignItems: 'center',
-      marginLeft: 10,
+
       flexDirection: 'row'
     },
     blankcell: {

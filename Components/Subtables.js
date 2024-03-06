@@ -428,16 +428,18 @@ const styles = StyleSheet.create({
     padding: 5,
     backgroundColor: '#E8AC13',
     borderRadius: 3,
+    marginLeft: 10, 
   },
   deleteIcon: {
     padding: 5,
     backgroundColor: '#BA0505',
-    borderRadius: 3
+    borderRadius: 3,
+    marginLeft: 10, 
   },
   editCell: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 10,
+
     flexDirection: 'row'
   },
   NewRText: {

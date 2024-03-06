@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, ImageBackground, Image, ActivityIndicator, Text } from 'react-native';
+import { View, TextInput, Button, Alert, StyleSheet, ImageBackground, Image, ActivityIndicator, Text,Linking,TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Airtable from 'airtable';
@@ -11,6 +11,13 @@ const LoginScreen = () => {
 
   const navigation = useNavigation();
   const [currentDatabase, setCurrentDatabase] = useState('Records');
+  const handleImagePress = () => {
+    // The URL you want to open
+    const websiteUrl = 'https://jays-organization-14.gitbook.io/crud_database/';
+    
+    // Open the website URL in the default browser
+    Linking.openURL(websiteUrl);
+  };
 
   const handleLogin = async () => {
     setLoading(true); // Set loading state to true when login process starts
@@ -43,6 +50,9 @@ const LoginScreen = () => {
   return (
     <ImageBackground source={require('../Assets/NFRDIBG.png')} style={styles.background}>
       <Image  source={require('../Assets/loginIcon.png')} style={styles.loginIcon} />
+      <TouchableOpacity onPress={handleImagePress}>
+        <Image source={require('../Assets/info.png')} style={styles.infoIcon} />
+      </TouchableOpacity>
       <View style={styles.container}>
       <TextInput
         style={styles.input}
@@ -100,6 +110,12 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     bottom: '5%'
+  },
+  infoIcon:{
+    height:30,
+    width:30,
+    right:'48%',
+    bottom:300
   }
 });
 
