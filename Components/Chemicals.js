@@ -293,13 +293,7 @@ const Chemicals = () => {
           handleRefresh={handleRefresh}
           setCurrentPage={setCurrentPage}
         />
-        <CreateUser 
-        currentDatabase ={currentDatabase}
-        isOpen={createModalVisible}
-        onClose={() => setCreateModalVisible(false)} 
-        handleRefresh={handleRefresh}
-        setCurrentPage={setCurrentPage}
-      />
+        
         {TableHeader()}
        
         <FlatList
