@@ -17,7 +17,7 @@ const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefres
           const response = await fetch(`https://api.airtable.com/v0/appzQzVWNYXH8WNks/${currentDatabase}?filterByFormula={Id}="${selectedItem.Id}"`, {
             method: 'GET',
             headers: {
-              'Authorization': 'Bearer patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3',
+              'Authorization': 'Bearer patG9t58PDUfG2Xhx.f87094464fa31eece79fb1868c858e94d92da3ef7157777734d1a548f54eb3e1',
               'Content-Type': 'application/json'
             }
           });
@@ -38,7 +38,7 @@ const Delete = ({isOpen , onClose , selectedItem , currentDatabase, handleRefres
         const deleteResponse = await fetch(`https://api.airtable.com/v0/appzQzVWNYXH8WNks/${currentDatabase}/${recordId}`, {
           method: 'DELETE',
           headers: {
-            'Authorization': 'Bearer patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3',
+            'Authorization': 'Bearer patG9t58PDUfG2Xhx.f87094464fa31eece79fb1868c858e94d92da3ef7157777734d1a548f54eb3e1',
             'Content-Type': 'application/json'
           },
         });

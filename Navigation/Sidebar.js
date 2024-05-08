@@ -51,6 +51,15 @@ const Sidebar = ({ switchDatabase, currentDatabase,Name, Role, Profile}) => {
         >
           <Text style={styles.databaseOptionText}>Chemicals</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.databaseOption,
+            currentDatabase === 'MicroLab' ? styles.activeDatabase : null,
+          ]}
+          onPress={() => navigation.navigate('MicroLab',{Name,Role,Profile})}
+        >
+          <Text style={styles.databaseOptionText}>MicroLab Supplies</Text>
+        </TouchableOpacity>
         {Role === 'Admin' && (
             <TouchableOpacity
             style={[

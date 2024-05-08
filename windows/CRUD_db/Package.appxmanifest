@@ -9,7 +9,7 @@
   <Identity
     Name="bae76214-2165-47fe-a624-3d4d54994756"
     Publisher="CN=btanyag"
-    Version="1.0.0.0" />
+    Version="1.0.2.0" />
 
   <mp:PhoneIdentity PhoneProductId="bae76214-2165-47fe-a624-3d4d54994756" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

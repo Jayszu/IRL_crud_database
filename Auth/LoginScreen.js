@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect} from 'react';
 import { View, TextInput, Button, Alert, StyleSheet, ImageBackground, Image, ActivityIndicator, Text,Linking,TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -8,7 +8,6 @@ const LoginScreen = () => {
   const [Username, setUsername] = useState('');
   const [Password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // State variable to track loading
-
   const navigation = useNavigation();
   const [currentDatabase, setCurrentDatabase] = useState('Records');
   const handleImagePress = () => {
@@ -18,20 +17,48 @@ const LoginScreen = () => {
     // Open the website URL in the default browser
     Linking.openURL(websiteUrl);
   };
+  
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+      if (isLoggedIn === 'true') {
+        const userName = await AsyncStorage.getItem('userName');
+        const userRole = await AsyncStorage.getItem('userRole');
+        const userProfile = await AsyncStorage.getItem('userProfile');
+  
+        // User is already logged in, navigate to the main screen with user information
+        navigation.navigate('Main', { 
+          Name: userName,
+          Role: userRole,
+          Profile: userProfile
+        });
+      }
+    };
+  
+    checkLoginStatus();
+  }, []);
+  
 
+  
   const handleLogin = async () => {
     setLoading(true); // Set loading state to true when login process starts
     try {
-      const base = new Airtable({ apiKey: 'patuAn2pKiuFSMoI8.1ad68d143585a93ed0c2348b3ab3adb9c1f8364b814d1a9149f763b6087ef2f3' })
+      const base = new Airtable({ apiKey: 'patG9t58PDUfG2Xhx.f87094464fa31eece79fb1868c858e94d92da3ef7157777734d1a548f54eb3e1' })
       .base('appjSsMo3NZ8iJPHL');
       const userRecords = await base(currentDatabase).select({ view: 'Grid view' }).all();
       const lowercaseUsername = Username.toLowerCase();
-
+  
       const matchingUser = userRecords.find(record => record.fields.Username.toLowerCase() === lowercaseUsername && record.fields.Password === Password);
       const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
-      
-      if (matchingUser || isLoggedIn === 'true') {
+  
+  
+      if (matchingUser) {
+        // Store login status in AsyncStorage
         await AsyncStorage.setItem('isLoggedIn', 'true');
+        await AsyncStorage.setItem('userName', matchingUser.fields.Name);
+      await AsyncStorage.setItem('userRole', matchingUser.fields.Role);
+      await AsyncStorage.setItem('userProfile', matchingUser.fields.Profile[0].url);
+  
         navigation.navigate('Main', { 
           Name: matchingUser.fields.Name,
           Role: matchingUser.fields.Role,
@@ -42,10 +69,12 @@ const LoginScreen = () => {
       }
     } catch (error) {
       console.error('Error logging in:', error);
+      Alert.alert("Error logging in. Please try again later.");
     } finally {
       setLoading(false); // Set loading state to false after login process completes
     }
   };
+  
 
   return (
     <ImageBackground source={require('../Assets/NFRDIBG.png')} style={styles.background}>
